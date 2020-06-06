@@ -15,12 +15,10 @@ type
   Jasonable* = concept j   ## It should be serializable to JSON.
     jason(j) is Json
 
-# practically a bug that i have to export these!
 proc add(js: var Json; s: Json) {.borrow.}
 proc `&`(js: Json; s: Json): Json {.borrow.}
 
 proc join(a: openArray[Json]; sep = Json""): Json =
-  ## Leaked implementation detail, as is `add` and `&`. 😠
   for index, item in a:
     if index != 0:
       result.add sep
@@ -44,7 +42,8 @@ macro jason*(js: Json): Json =
 
 macro jason*(s: string): Json =
   ## Escapes a string to form "JSON".
-  result = json newCall(ident"escape", s)
+  let escapist = bindSym "escape"
+  result = json newCall(escapist, s)
 
 macro jason*(b: bool): Json =
   ## Produce a JSON boolean, either `true` or `false`.
@@ -73,12 +72,13 @@ func jason*(f: SomeFloat): Json =
 
 proc composeWithComma(parent: NimNode; js: NimNode): NimNode =
   # whether we need to add a comma before the next element
-  var comma = gensym(nskVar)
+  let adder = bindSym "add"
+  var comma = gensym(nskVar, "comma")
   parent.add newVarStmt(comma, ident"false")         # var comma = false
 
   var cond = nnkElifExpr.newNimNode
   cond.add comma                                     # if comma:
-  cond.add ident"add".newCall(js, json",")           # js.add ","
+  cond.add adder.newCall(js, json",")                # js.add ","
 
   var toggle = nnkElseExpr.newNimNode                # else:
   toggle.add newAssignment(comma, ident"true")       # comma = true
@@ -91,19 +91,19 @@ proc composeWithComma(parent: NimNode; js: NimNode): NimNode =
 
 macro jason*(a: JasonArray): Json =
   ## Render an iterable that isn't a named-tuple or object as a JSON array.
+  let adder = bindSym "add"
   result = newStmtList()
 
-  var js = gensym(nskVar)
+  var js = gensym(nskVar, "js")
   result.add newVarStmt(js, json"[")          # the leading [
 
   # make a loop over the items in the iterable
   let loop = block:
-    var value = gensym(nskForVar)             # make loop var
+    var value = gensym(nskForVar, "value")    # make loop var
 
     var body = nnkStmtList.newNimNode         # make body of a loop
     body.add composeWithComma(result, js)     # maybe add a separator
-    body.add ident"add".newCall(js,           # add the json for value
-                                value.jason)
+    body.add adder.newCall(js, value.jason)   # add the json for value
 
     var loop = nnkForStmt.newNimNode          # for loop
     loop.add value                            # add loop var
@@ -113,12 +113,13 @@ macro jason*(a: JasonArray): Json =
     loop
 
   result.add loop                             # add the loop
-  result.add ident"add".newCall(js, json"]")  # add the trailing ]
+  result.add adder.newCall(js, json"]")       # add the trailing ]
 
   # the last statement in the statement list is the json
   result.add js
 
 proc jasonCurly(o: NimNode): NimNode =
+  let adder = bindSym "add"
   result = newStmtList()
 
   var js = gensym(nskVar, "js")
@@ -131,9 +132,9 @@ proc jasonCurly(o: NimNode): NimNode =
 
     var body = nnkStmtList.newNimNode              # make body of a loop
     body.add composeWithComma(result, js)          # maybe add a separator
-    body.add ident"add".newCall(js, key.jason)     # "somekey" (json)
-    body.add ident"add".newCall(js, json":")       # : (json)
-    body.add ident"add".newCall(js, val.jason)     # someval (json)
+    body.add adder.newCall(js, key.jason)          # "somekey" (json)
+    body.add adder.newCall(js, json":")            # : (json)
+    body.add adder.newCall(js, val.jason)          # someval (json)
 
     var loop = nnkForStmt.newNimNode               # make for loop
     loop.add key                                   # add key to the loop
@@ -144,7 +145,7 @@ proc jasonCurly(o: NimNode): NimNode =
     loop
 
   result.add loop                                  # add the loop
-  result.add ident"add".newCall(js, json"}")       # add the trailing ]
+  result.add adder.newCall(js, json"}")            # add the trailing ]
 
   # the last statement in the statement list is the json
   result.add js
@@ -152,7 +153,10 @@ proc jasonCurly(o: NimNode): NimNode =
 macro jason*(o: JasonObject): Json =
   ## Render an anonymous Nim tuple as a JSON array; objects and named
   ## tuples become JSON objects.
-  let typ = o.getTypeInst
+  let
+    joiner = bindSym "join"
+    ander = bindSym "&"
+    typ = o.getTypeInst
   if typ.kind != nnkTupleConstr:
     # use our object construction code for named tuples, objects
     result = jasonCurly(o)
@@ -160,7 +164,7 @@ macro jason*(o: JasonObject): Json =
     # it is a (34, "hello")-style anonymous tuple construction
     result = newStmtList()
     # first, stash the tuple temporarily
-    let temp = gensym(nskLet)
+    let temp = gensym(nskLet, "temp")
     result.add newLetStmt(temp, o)
 
     # arr will hold a list of strings we'll concatenate at the end
@@ -179,12 +183,12 @@ macro jason*(o: JasonObject): Json =
       # the jason() in jason(:tmp[3])
       inf.add exp.jason
     # now join the array with commas
-    arr.add newCall(ident"join", inf, json",")
+    arr.add newCall(joiner, inf, json",")
     # and add the trailing "]"
     arr.add json"]"
 
     # now fold the array with &
-    result.add nestList(ident"&", arr)
+    result.add nestList(ander, arr)
 
 # i want this to be jason(o: ref Jasonable)
 func jason*(o: ref): Json =
@@ -197,7 +201,3 @@ func jason*(o: ref): Json =
 func `$`*(j: Json): string =
   ## Convenience for Json.
   result = j.string
-
-# practically a bug that i have to export these!
-when not defined(nimdoc):
-  export escape, add, `&`, join

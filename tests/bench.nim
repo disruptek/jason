@@ -35,19 +35,19 @@ type
     ducks: float
     dogs: string
     cats: bool
-    frogs: tuple[toads: bool, rats: string]
+    #frogs: tuple[toads: bool, rats: string]
 
 const
   thing = Some(goats: ["pigs", "horses"],
                sheep: 11, ducks: 12.0,
-               dogs: "woof", cats: false,
-               frogs: (toads: true, rats: "yep"))
+               dogs: "woof", cats: false )#,
+               #frogs: (toads: true, rats: "yep"))
 
 var
   thang = Some(goats: ["pigs", "horses"],
                sheep: 11, ducks: 12.0,
-               dogs: "woof", cats: false,
-               frogs: (toads: true, rats: "yep"))
+               dogs: "woof", cats: false) #,
+               #frogs: (toads: true, rats: "yep"))
 
 var cfg = newDefaultConfig()
 cfg.budget = 0.5
@@ -124,9 +124,8 @@ benchmark cfg:
   proc encode_jason_obj() {.measure.} =
     discard nobj.jason
 
-  when false:
-    proc encode_stdlib() {.measure.} =
-      discard $tJsO
+  proc encode_stdlib() {.measure.} =
+    discard $(%*thing)
 
-    proc encode_jason() {.measure.} =
-      discard thing.jason
+  proc encode_jason() {.measure.} =
+    discard thing.jason
