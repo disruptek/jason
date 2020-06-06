@@ -86,8 +86,8 @@ let b = B(x: 3, y: "sup")
 let c: C = @[ B(x: 1), B(x: 2), B(x: 3) ]
 
 func jason(n: B): Json =
-  if n.x == 3: jason"odd"
-  else:        jason"even"
+  if n.x mod 2 == 0: jason"even"
+  else:              jason"odd"
 
 echo b.jason      # "odd"
 echo c.jason      # ["odd","even","odd"]
