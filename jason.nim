@@ -2,7 +2,7 @@ import std/macros
 import std/strutils
 
 type
-  Json = distinct string
+  Json = distinct string   ## Serialized JSON.
 
   JasonObject = concept j
     for v in fields(j):
@@ -12,7 +12,7 @@ type
     for v in j:
       jason(v) is Json
 
-  Jasonable = concept j
+  Jasonable* = concept j   ## It should be serializable to JSON.
     jason(j) is Json
 
 # practically a bug that i have to export these!
@@ -20,30 +20,34 @@ proc add*(js: var Json; s: Json) {.borrow.}
 proc `&`*(js: Json; s: Json): Json {.borrow.}
 
 proc join*(a: openArray[Json]; sep = Json""): Json =
+  ## Leaked implementation detail, as is `add` and `&`. 😠
   for index, item in a:
     if index != 0:
       result.add sep
     result.add item
 
 proc json(node: NimNode): NimNode =
-  ## Convenience for Json(...)
+  ## Convenience for Json(...) in macros.
   result = newCall(ident"Json", node)
 
 proc json(node: string): NimNode =
-  ## Convenience for Json"[]"
+  ## Convenience for Json("[]") in macros.
   result = json newLit(node)
 
 func jason*(node: NimNode): NimNode =
-  ## Convenience for jason(...)
+  ## Convenience for jason(...) in macros.
   result = newCall(ident"jason", node)
 
 macro jason*(js: Json): Json =
+  ## Idempotent Json handler.
   result = js
 
 macro jason*(s: string): Json =
+  ## Escapes a string to form "JSON".
   result = json newCall(ident"escape", s)
 
 macro jason*(b: bool): Json =
+  ## Produce a JSON boolean, either `true` or `false`.
   var cond = nnkElifExpr.newNimNode
   cond.add b
   cond.add json"true"
@@ -56,12 +60,15 @@ macro jason*(b: bool): Json =
   result.add els
 
 func jason*(e: enum): Json =
+  ## Render any `enum` type as a JSON integer, by default.
   result = Json($ord(e))
 
 func jason*(i: SomeInteger): Json =
+  ## Render any Nim integer as a JSON integer.
   result = Json($i)
 
 func jason*(f: SomeFloat): Json =
+  ## Render any Nim float as a JSON number.
   result = Json($f)
 
 proc composeWithComma(parent: NimNode; js: NimNode): NimNode =
@@ -83,6 +90,7 @@ proc composeWithComma(parent: NimNode; js: NimNode): NimNode =
   sep
 
 macro jason*(a: JasonArray): Json =
+  ## Render an iterable that isn't a named-tuple or object as a JSON array.
   result = newStmtList()
 
   var js = gensym(nskVar)
@@ -142,9 +150,11 @@ proc jasonCurly(o: NimNode): NimNode =
   result.add js
 
 macro jason*(o: object): Json =
+  ## Render a Nim object as a JSON object.
   result = jasonCurly(o)
 
 macro jason*(o: tuple): Json =
+  ## Render a Nim tuple as a JSON array; named tuples become JSON objects.
   result = newStmtList()
   # first, stash the tuple temporarily
   let temp = gensym(nskLet)
@@ -181,12 +191,14 @@ macro jason*(o: tuple): Json =
     result.add nestList(ident"&", arr)
 
 func jason*(o: ref): Json =
+  ## Render a Nim `ref` as either `null` or the value to which it refers.
   if o.isNil:
     result = Json"null"
   else:
     result = jason o[]
 
 func `$`*(j: Json): string =
+  ## Convenience for Json.
   result = j.string
 
 # practically a bug that i have to export these!

@@ -101,6 +101,15 @@ function main() {
   </div>
   <ul class="simple simple-toc" id="toc-list">
 <li>
+  <a class="reference reference-toplevel" href="#7" id="57">Types</a>
+  <ul class="simple simple-toc-section">
+      <li><a class="reference" href="#Jasonable"
+    title="Jasonable = concept j
+    jason(j) is Json"><wbr />Jasonable<span class="attachedType"></span></a></li>
+
+  </ul>
+</li>
+<li>
   <a class="reference reference-toplevel" href="#12" id="62">Procs</a>
   <ul class="simple simple-toc-section">
       <li><a class="reference" href="#add%2CJson%2CJson"
@@ -156,7 +165,20 @@ function main() {
   <div id="tocRoot"></div>
   
   <p class="module-desc"></p>
-  <div class="section" id="12">
+  <div class="section" id="7">
+<h1><a class="toc-backref" href="#7">Types</a></h1>
+<dl class="item">
+<a id="Jasonable"></a>
+<dt><pre><a href="jason.html#Jasonable"><span class="Identifier">Jasonable</span></a> <span class="Other">=</span> <span class="Keyword">concept</span> <span class="Identifier">j</span>
+    <span class="Identifier">jason</span><span class="Other">(</span><span class="Identifier">j</span><span class="Other">)</span> <span class="Identifier">is</span> <span class="Identifier">Json</span></pre></dt>
+<dd>
+
+It should be serializable to JSON.
+
+</dd>
+
+</dl></div>
+<div class="section" id="12">
 <h1><a class="toc-backref" href="#12">Procs</a></h1>
 <dl class="item">
 <a id="add,Json,Json"></a>
@@ -177,7 +199,7 @@ function main() {
 <dt><pre><span class="Keyword">proc</span> <a href="#join%2CopenArray%5BJson%5D"><span class="Identifier">join</span></a><span class="Other">(</span><span class="Identifier">a</span><span class="Other">:</span> <span class="Identifier">openArray</span><span class="Other">[</span><span class="Identifier">Json</span><span class="Other">]</span><span class="Other">;</span> <span class="Identifier">sep</span> <span class="Other">=</span> <span class="Identifier">Json</span><span class="StringLit">&quot;&quot;</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">Json</span> <span><span class="Other">{</span><span class="Other pragmadots">...</span><span class="Other">}</span></span><span class="pragmawrap"><span class="Other">{.</span><span class="pragma"><span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></span><span class="Other">.}</span></span></pre></dt>
 <dd>
 
-
+Leaked implementation detail, as is <tt class="docutils literal"><span class="pre">add</span></tt> and <tt class="docutils literal"><span class="pre">&amp;</span></tt>. 😠
 
 </dd>
 
@@ -189,42 +211,42 @@ function main() {
 <dt><pre><span class="Keyword">func</span> <a href="#jason%2CNimNode"><span class="Identifier">jason</span></a><span class="Other">(</span><span class="Identifier">node</span><span class="Other">:</span> <span class="Identifier">NimNode</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">NimNode</span> <span><span class="Other">{</span><span class="Other pragmadots">...</span><span class="Other">}</span></span><span class="pragmawrap"><span class="Other">{.</span><span class="pragma"><span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></span><span class="Other">.}</span></span></pre></dt>
 <dd>
 
-Convenience for jason(...)
+Convenience for jason(...) in macros.
 
 </dd>
 <a id="jason"></a>
 <dt><pre><span class="Keyword">func</span> <a href="#jason"><span class="Identifier">jason</span></a><span class="Other">(</span><span class="Identifier">e</span><span class="Other">:</span> <span class="Keyword">enum</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">Json</span></pre></dt>
 <dd>
 
-
+Render any <tt class="docutils literal"><span class="pre">enum</span></tt> type as a JSON integer, by default.
 
 </dd>
 <a id="jason,SomeInteger"></a>
 <dt><pre><span class="Keyword">func</span> <a href="#jason%2CSomeInteger"><span class="Identifier">jason</span></a><span class="Other">(</span><span class="Identifier">i</span><span class="Other">:</span> <span class="Identifier">SomeInteger</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">Json</span></pre></dt>
 <dd>
 
-
+Render any Nim integer as a JSON integer.
 
 </dd>
 <a id="jason,SomeFloat"></a>
 <dt><pre><span class="Keyword">func</span> <a href="#jason%2CSomeFloat"><span class="Identifier">jason</span></a><span class="Other">(</span><span class="Identifier">f</span><span class="Other">:</span> <span class="Identifier">SomeFloat</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">Json</span></pre></dt>
 <dd>
 
-
+Render any Nim float as a JSON number.
 
 </dd>
 <a id="jason,ref"></a>
 <dt><pre><span class="Keyword">func</span> <a href="#jason%2Cref"><span class="Identifier">jason</span></a><span class="Other">(</span><span class="Identifier">o</span><span class="Other">:</span> <span class="Keyword">ref</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">Json</span></pre></dt>
 <dd>
 
-
+Render a Nim <tt class="docutils literal"><span class="pre">ref</span></tt> as either <tt class="docutils literal"><span class="pre">null</span></tt> or the value to which it refers.
 
 </dd>
 <a id="$,Json"></a>
 <dt><pre><span class="Keyword">func</span> <a href="#%24%2CJson"><span class="Identifier">`$`</span></a><span class="Other">(</span><span class="Identifier">j</span><span class="Other">:</span> <span class="Identifier">Json</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">string</span> <span><span class="Other">{</span><span class="Other pragmadots">...</span><span class="Other">}</span></span><span class="pragmawrap"><span class="Other">{.</span><span class="pragma"><span class="Identifier">raises</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span><span class="Other">,</span> <span class="Identifier">tags</span><span class="Other">:</span> <span class="Other">[</span><span class="Other">]</span></span><span class="Other">.}</span></span></pre></dt>
 <dd>
 
-
+Convenience for Json.
 
 </dd>
 
@@ -236,42 +258,42 @@ Convenience for jason(...)
 <dt><pre><span class="Keyword">macro</span> <a href="#jason.m%2CJson"><span class="Identifier">jason</span></a><span class="Other">(</span><span class="Identifier">js</span><span class="Other">:</span> <span class="Identifier">Json</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">Json</span></pre></dt>
 <dd>
 
-
+Idempotent Json handler.
 
 </dd>
 <a id="jason.m,string"></a>
 <dt><pre><span class="Keyword">macro</span> <a href="#jason.m%2Cstring"><span class="Identifier">jason</span></a><span class="Other">(</span><span class="Identifier">s</span><span class="Other">:</span> <span class="Identifier">string</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">Json</span></pre></dt>
 <dd>
 
-
+Escapes a string to form &quot;JSON&quot;.
 
 </dd>
 <a id="jason.m,bool"></a>
 <dt><pre><span class="Keyword">macro</span> <a href="#jason.m%2Cbool"><span class="Identifier">jason</span></a><span class="Other">(</span><span class="Identifier">b</span><span class="Other">:</span> <span class="Identifier">bool</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">Json</span></pre></dt>
 <dd>
 
-
+Produce a JSON boolean, either <tt class="docutils literal"><span class="pre">true</span></tt> or <tt class="docutils literal"><span class="pre">false</span></tt>.
 
 </dd>
 <a id="jason.m,JasonArray"></a>
 <dt><pre><span class="Keyword">macro</span> <a href="#jason.m%2CJasonArray"><span class="Identifier">jason</span></a><span class="Other">(</span><span class="Identifier">a</span><span class="Other">:</span> <span class="Identifier">JasonArray</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">Json</span></pre></dt>
 <dd>
 
-
+Render an iterable that isn't a named-tuple or object as a JSON array.
 
 </dd>
 <a id="jason.m"></a>
 <dt><pre><span class="Keyword">macro</span> <a href="#jason.m"><span class="Identifier">jason</span></a><span class="Other">(</span><span class="Identifier">o</span><span class="Other">:</span> <span class="Keyword">object</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">Json</span></pre></dt>
 <dd>
 
-
+Render a Nim object as a JSON object.
 
 </dd>
 <a id="jason.m_2"></a>
 <dt><pre><span class="Keyword">macro</span> <a href="#jason.m_2"><span class="Identifier">jason</span></a><span class="Other">(</span><span class="Identifier">o</span><span class="Other">:</span> <span class="Keyword">tuple</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">Json</span></pre></dt>
 <dd>
 
-
+Render a Nim tuple as a JSON array; named tuples become JSON objects.
 
 </dd>
 
@@ -284,7 +306,7 @@ Convenience for jason(...)
       <div class="twelve-columns footer">
         <span class="nim-sprite"></span>
         <br/>
-        <small style="color: var(--hint);">Made with Nim. Generated: 2020-06-06 01:49:47 UTC</small>
+        <small style="color: var(--hint);">Made with Nim. Generated: 2020-06-06 02:02:34 UTC</small>
       </div>
     </div>
   </div>

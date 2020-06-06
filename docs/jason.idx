@@ -1,3 +1,4 @@
+Jasonable	jason.html#Jasonable	jason: Jasonable	
 add	jason.html#add,Json,Json	jason: add(js: var Json; s: Json)	
 `&amp;`	jason.html#&,Json,Json	jason: `&amp;`(js: Json; s: Json): Json	
 join	jason.html#join,openArray[Json]	jason: join(a: openArray[Json]; sep = Json&quot;&quot;): Json	
