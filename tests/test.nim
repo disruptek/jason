@@ -1,4 +1,3 @@
-import std/macros
 import std/unittest
 
 import jason

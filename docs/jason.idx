@@ -10,7 +10,6 @@ jason	jason.html#jason	jason: jason(e: enum): Json
 jason	jason.html#jason,SomeInteger	jason: jason(i: SomeInteger): Json	
 jason	jason.html#jason,SomeFloat	jason: jason(f: SomeFloat): Json	
 jason	jason.html#jason.m,JasonArray	jason: jason(a: JasonArray): Json	
-jason	jason.html#jason.m	jason: jason(o: object): Json	
-jason	jason.html#jason.m_2	jason: jason(o: tuple): Json	
+jason	jason.html#jason.m,JasonObject	jason: jason(o: JasonObject): Json	
 jason	jason.html#jason,ref	jason: jason(o: ref): Json	
 `$`	jason.html#$,Json	jason: `$`(j: Json): string	

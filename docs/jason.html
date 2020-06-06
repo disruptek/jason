@@ -150,10 +150,8 @@ function main() {
     title="jason(b: bool): Json"><wbr />jason<span class="attachedType"></span></a></li>
   <li><a class="reference" href="#jason.m%2CJasonArray"
     title="jason(a: JasonArray): Json"><wbr />jason<span class="attachedType"></span></a></li>
-  <li><a class="reference" href="#jason.m"
-    title="jason(o: object): Json"><wbr />jason<span class="attachedType"></span></a></li>
-  <li><a class="reference" href="#jason.m_2"
-    title="jason(o: tuple): Json"><wbr />jason<span class="attachedType"></span></a></li>
+  <li><a class="reference" href="#jason.m%2CJasonObject"
+    title="jason(o: JasonObject): Json"><wbr />jason<span class="attachedType"></span></a></li>
 
   </ul>
 </li>
@@ -282,18 +280,11 @@ Produce a JSON boolean, either <tt class="docutils literal"><span class="pre">tr
 Render an iterable that isn't a named-tuple or object as a JSON array.
 
 </dd>
-<a id="jason.m"></a>
-<dt><pre><span class="Keyword">macro</span> <a href="#jason.m"><span class="Identifier">jason</span></a><span class="Other">(</span><span class="Identifier">o</span><span class="Other">:</span> <span class="Keyword">object</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">Json</span></pre></dt>
+<a id="jason.m,JasonObject"></a>
+<dt><pre><span class="Keyword">macro</span> <a href="#jason.m%2CJasonObject"><span class="Identifier">jason</span></a><span class="Other">(</span><span class="Identifier">o</span><span class="Other">:</span> <span class="Identifier">JasonObject</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">Json</span></pre></dt>
 <dd>
 
-Render a Nim object as a JSON object.
-
-</dd>
-<a id="jason.m_2"></a>
-<dt><pre><span class="Keyword">macro</span> <a href="#jason.m_2"><span class="Identifier">jason</span></a><span class="Other">(</span><span class="Identifier">o</span><span class="Other">:</span> <span class="Keyword">tuple</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">Json</span></pre></dt>
-<dd>
-
-Render a Nim tuple as a JSON array; named tuples become JSON objects.
+Render an anonymous Nim tuple as a JSON array; objects and named tuples become JSON objects.
 
 </dd>
 
@@ -306,7 +297,7 @@ Render a Nim tuple as a JSON array; named tuples become JSON objects.
       <div class="twelve-columns footer">
         <span class="nim-sprite"></span>
         <br/>
-        <small style="color: var(--hint);">Made with Nim. Generated: 2020-06-06 02:02:34 UTC</small>
+        <small style="color: var(--hint);">Made with Nim. Generated: 2020-06-06 02:27:32 UTC</small>
       </div>
     </div>
   </div>

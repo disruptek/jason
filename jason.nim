@@ -149,23 +149,19 @@ proc jasonCurly(o: NimNode): NimNode =
   # the last statement in the statement list is the json
   result.add js
 
-macro jason*(o: object): Json =
-  ## Render a Nim object as a JSON object.
-  result = jasonCurly(o)
-
-macro jason*(o: tuple): Json =
-  ## Render a Nim tuple as a JSON array; named tuples become JSON objects.
-  result = newStmtList()
-  # first, stash the tuple temporarily
-  let temp = gensym(nskLet)
-  result.add newLetStmt(temp, o)
-
+macro jason*(o: JasonObject): Json =
+  ## Render an anonymous Nim tuple as a JSON array; objects and named
+  ## tuples become JSON objects.
   let typ = o.getTypeInst
   if typ.kind != nnkTupleConstr:
-    # use our object construction code for named tuples
-    return jasonCurly(o)
+    # use our object construction code for named tuples, objects
+    result = jasonCurly(o)
   else:
     # it is a (34, "hello")-style anonymous tuple construction
+    result = newStmtList()
+    # first, stash the tuple temporarily
+    let temp = gensym(nskLet)
+    result.add newLetStmt(temp, o)
 
     # arr will hold a list of strings we'll concatenate at the end
     var arr = newStmtList()
