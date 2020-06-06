@@ -10,21 +10,15 @@ proc execCmd(cmd: string) =
   exec cmd
 
 proc execTest(test: string) =
-  when true:
-    execCmd "nim c -d:danger -r " & test & " write"
-    execCmd "nim c -d:danger -r " & test & " read"
-    execCmd "nim c -d:danger -r " & test & " write 500"
-    execCmd "nim c -d:danger -r " & test & " read 500"
-  else:
-    execCmd "nim c              -r " & test & " write"
-    execCmd "nim c   -d:danger  -r " & test & " read"
-    execCmd "nim cpp            -r " & test & " write"
-    execCmd "nim cpp -d:danger  -r " & test & " read"
-    when NimMajor >= 1 and NimMinor >= 1:
-      execCmd "nim c --useVersion:1.0 -d:danger -r " & test & " write"
-      execCmd "nim c --useVersion:1.0 -d:danger -r " & test & " read"
-      execCmd "nim c   --gc:arc -r " & test & " write"
-      execCmd "nim cpp --gc:arc -r " & test & " read"
+  execCmd "nim c              -r " & test
+  execCmd "nim c   -d:danger  -r " & test
+  execCmd "nim cpp            -r " & test
+  execCmd "nim cpp -d:danger  -r " & test
+  when NimMajor >= 1 and NimMinor >= 1:
+    execCmd "nim c   --gc:arc -r " & test
+    execCmd "nim cpp --gc:arc -r " & test
+    execCmd "nim c   -d:danger --gc:arc -r " & test
+    execCmd "nim cpp -d:danger --gc:arc -r " & test
 
 task test, "run tests for travis":
   execTest("tests/test.nim")
