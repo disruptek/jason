@@ -85,9 +85,6 @@ benchmark cfg:
   jarr.add newJString("goats")
   jarr.add newJString("pigs")
 
-
-
-
   proc encode_stdlib_int() {.measure.} =
     discard $jint
 

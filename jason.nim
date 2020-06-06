@@ -2,7 +2,7 @@ import std/macros
 import std/strutils
 
 type
-  Json = distinct string   ## Serialized JSON.
+  Json* = distinct string   ## Serialized JSON.
 
   JasonObject = concept j
     for v in fields(j):
@@ -16,10 +16,10 @@ type
     jason(j) is Json
 
 # practically a bug that i have to export these!
-proc add*(js: var Json; s: Json) {.borrow.}
-proc `&`*(js: Json; s: Json): Json {.borrow.}
+proc add(js: var Json; s: Json) {.borrow.}
+proc `&`(js: Json; s: Json): Json {.borrow.}
 
-proc join*(a: openArray[Json]; sep = Json""): Json =
+proc join(a: openArray[Json]; sep = Json""): Json =
   ## Leaked implementation detail, as is `add` and `&`. 😠
   for index, item in a:
     if index != 0:
@@ -103,7 +103,7 @@ macro jason*(a: JasonArray): Json =
     var body = nnkStmtList.newNimNode         # make body of a loop
     body.add composeWithComma(result, js)     # maybe add a separator
     body.add ident"add".newCall(js,           # add the json for value
-                        value.jason)
+                                value.jason)
 
     var loop = nnkForStmt.newNimNode          # for loop
     loop.add value                            # add loop var
@@ -186,6 +186,7 @@ macro jason*(o: JasonObject): Json =
     # now fold the array with &
     result.add nestList(ident"&", arr)
 
+# i want this to be jason(o: ref Jasonable)
 func jason*(o: ref): Json =
   ## Render a Nim `ref` as either `null` or the value to which it refers.
   if o.isNil:
@@ -198,4 +199,5 @@ func `$`*(j: Json): string =
   result = j.string
 
 # practically a bug that i have to export these!
-export Json, escape
+when not defined(nimdoc):
+  export escape, add, `&`, join
