@@ -6,11 +6,11 @@ type
 
   JasonObject = concept j
     for v in fields(j):
-      jason(v) is Json
+      v is Jasonable
 
   JasonArray = concept j
     for v in j:
-      jason(v) is Json
+      v is Jasonable
 
   Jasonable* = concept j   ## It should be serializable to JSON.
     jason(j) is Json
