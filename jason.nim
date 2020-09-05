@@ -170,6 +170,12 @@ proc jasonCurly(o: NimNode): NimNode =
 macro jason*(o: JasonObject): Json =
   ## Render an anonymous Nim tuple as a JSON array; objects and named
   ## tuples become JSON objects.
+  runnableExamples:
+    let j = jason (1, "two", 3.0)
+    assert $j == """[1,"two",3.0]"""
+    let k = jason (one: 1, two: "two", three: 3.0)
+    assert $k == """{"one":1,"two":"two","three":3.0}"""
+
   let
     joiner = bindSym "join"
     ander = bindSym "&"
