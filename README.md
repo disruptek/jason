@@ -1,10 +1,14 @@
 # jason
-(mostly) compile-time JSON encoding
+
+[![Test Matrix](https://github.com/disruptek/jason/workflows/CI/badge.svg)](https://github.com/disruptek/jason/actions?query=workflow%3ACI)
+[![GitHub release (latest by date)](https://img.shields.io/github/v/release/disruptek/jason?style=flat)](https://github.com/disruptek/jason/releases/latest)
+![Minimum supported Nim version](https://img.shields.io/badge/nim-1.0.8%2B-informational?style=flat&logo=nim)
+[![License](https://img.shields.io/github/license/disruptek/jason?style=flat)](#license)
+[![buy me a coffee](https://img.shields.io/badge/donate-buy%20me%20a%20coffee-orange.svg)](https://www.buymeacoffee.com/disruptek)
+
+**mostly** compile-time JSON encoding
 
 "I don't care." -- _Araq, 2020_
-
-- `cpp +/ nim-1.0` [![Build Status](https://travis-ci.org/disruptek/jason.svg?branch=master)](https://travis-ci.org/disruptek/jason)
-- `arc +/ cpp +/ nim-1.3` [![Build Status](https://travis-ci.org/disruptek/jason.svg?branch=devel)](https://travis-ci.org/disruptek/jason)
 
 ## Goals
 
@@ -93,7 +97,7 @@ echo b.jason      # "odd"
 echo c.jason      # ["odd","even","odd"]
 ```
 
-Json is a proper type.
+`Json` is a proper type.
 
 ```nim
 var n: string = jason"foo"      # type error
@@ -101,8 +105,6 @@ var x: string = $"foo".jason    # ok
 var y = jason"foo"              # ok
 y.add "bif"                     # type error
 ```
-
-More to come...
 
 ## Installation
 
@@ -116,19 +118,11 @@ $ nimble install https://github.com/disruptek/jason
 
 ## Documentation
 
-_WIP_
-
 I'm going to try a little harder with these docs by using `runnableExamples`
-so the documentation demonstrates _current_ usage examples and working tests
-despite the rapidly-evolving API.
+so the documentation demonstrates _current_ usage examples and working tests.
 
 [See the documentation for the jason module as generated directly from the
 source.](https://disruptek.github.io/jason/jason.html)
-
-## Testing
-
-There's a test and a benchmark under `tests/`; the benchmark requires
-[criterion](https://disruptek.github.io/criterion).
 
 ## License
 MIT

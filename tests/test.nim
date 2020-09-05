@@ -1,4 +1,4 @@
-import std/unittest
+import testes
 
 import jason
 
@@ -32,7 +32,7 @@ func `==`(s: string; js: Json): bool =
   result = system.`==`(js.string, s)
 
 
-suite "jason":
+testes:
   test "string":
     check jason"hello" == """"hello""""
 
