@@ -42,11 +42,19 @@ macro jason*(js: Json): Json =
 
 macro jason*(s: string): Json =
   ## Escapes a string to form "JSON".
+  runnableExamples:
+    let j = jason"goats"
+    assert $j == "\"goats\""
+
   let escapist = bindSym "escape"
   result = json newCall(escapist, s)
 
 macro jason*(b: bool): Json =
   ## Produce a JSON boolean, either `true` or `false`.
+  runnableExamples:
+    let j = jason(1 == 2)
+    assert $j == "false"
+
   var cond = nnkElifExpr.newNimNode
   cond.add b
   cond.add json"true"
