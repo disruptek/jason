@@ -38,6 +38,11 @@ func jason*(node: NimNode): NimNode =
 
 macro jason*(js: Json): Json =
   ## Idempotent Json handler.
+  runnableExamples:
+    let j = 3.jason
+    let k = jason j
+    assert $k == "3"
+
   result = js
 
 macro jason*(s: string): Json =
@@ -99,6 +104,10 @@ proc composeWithComma(parent: NimNode; js: NimNode): NimNode =
 
 macro jason*(a: JasonArray): Json =
   ## Render an iterable that isn't a named-tuple or object as a JSON array.
+  runnableExamples:
+    let j = jason [1, 3, 5, 7]
+    assert $j == "[1,3,5,7]"
+
   let adder = bindSym "add"
   result = newStmtList()
 
