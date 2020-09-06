@@ -14,7 +14,8 @@ proc execCmd(cmd: string) =
 proc execTest(test: string) =
   when getEnv("GITHUB_ACTIONS", "false") != "true":
     execCmd "nim c -r " & test
-    execCmd "nim cpp --gc:arc -d:danger -r " & test
+    when (NimMajor, NimMinor) >= (1, 2):
+      execCmd "nim cpp --gc:arc -d:danger -r " & test
   else:
     execCmd "nim c              -r " & test
     execCmd "nim cpp            -r " & test
