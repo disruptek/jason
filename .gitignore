@@ -1,4 +1,6 @@
 nim.cfg
 bin/
 nimblemeta.json
-docs/
+docs/*
+!docs/.*
+!docs/*.svg

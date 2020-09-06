@@ -24,8 +24,8 @@ it's faster than the standard library's `json` module. In rare cases, you may
 find it a little slower.
 
 Static values known at compile-time such as constants or macro outputs are
-serialized at compile-time. This is orders of magnitude faster than the
-standard library.
+serialized at compile-time. [This is orders of magnitude faster than the
+standard library](https://github.com/disruptek/jason#benchmarks).
 
 But the main advantage is that you get JSON encoding of tuples, objects, and
 iterators "for free" -- no serialization to implement and no duplication of
@@ -118,6 +118,9 @@ var x: string = $"foo".jason    # ok
 var y = jason"foo"              # ok
 y.add "bif"                     # type error
 ```
+
+## Benchmarks
+![benchmarks](docs/bench.svg "benchmarks")
 
 ## Installation
 

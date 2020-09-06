@@ -28,3 +28,6 @@ proc execTest(test: string) =
 
 task test, "run tests for ci":
   execTest("tests/test.nim")
+
+task docs, "generate benchmark":
+  exec "termtosvg docs/bench.svg --loop-delay=10000 --screen-geometry=80x30 --template=window_frame_powershell --command=\"nim c --gc:arc --define:danger -r tests/bench.nim\""
