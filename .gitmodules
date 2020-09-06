@@ -6,3 +6,7 @@
 	path = criterion
 	url = https://github.com/disruptek/criterion
 	branch = tag/0.2.0
+[submodule "grok"]
+	path = grok
+	url = git+ssh://git@github.com/disruptek/grok
+	branch = master
