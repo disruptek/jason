@@ -44,7 +44,7 @@ proc escapeJsonUnquoted(s: string; result: var string) {.used.} =
     of '\\': result.add("\\\\")
     else: result.add(c)
 
-proc escapeJsonUnquoted(s: string): string =
+proc escapeJsonUnquoted(s: string): string {.used.} =
   ## Converts a string `s` to its JSON representation without quotes.
   result = newStringOfCap(s.len + s.len shr 3)
   escapeJsonUnquoted(s, result)
