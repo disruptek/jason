@@ -97,17 +97,20 @@ let c: C = @[ B(x: 1), B(x: 2), B(x: 3) ]
 const a = B(x: 4, y: "compile-time!")
 
 func jason(n: B): Json =
-  ## my special json encoding for B
   if n.x mod 2 == 0: jason"even"
   else:              jason"odd"
 
-macro jason(n: static[B]): Json =
-  ## compile-time json encoding is free!
-  newCall(ident"Json", newLit(n.jason.string))
+# enabling compile-time encoding is easy
+staticJason C
 
-echo a.jason      # "even"
-echo b.jason      # "odd"
-echo c.jason      # ["odd","even","odd"]
+# or you can define static encoding yourself
+macro jason(n: static[B]): Json =
+  if n.x mod 2 == 0: jasonify"1"
+  else:              jasonify"0"
+
+check a.jason == "1"
+check b.jason == """"odd""""
+check c.jason == """["odd","even","odd"]"""
 ```
 
 `Json` is a proper type.

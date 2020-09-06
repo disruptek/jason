@@ -61,14 +61,6 @@ proc escapeJson(s: string): string =
   result = newStringOfCap(s.len + s.len shr 3)
   escapeJson(s, result)
 
-proc json(node: NimNode): NimNode =
-  ## Convenience for Json(...) in macros.
-  result = newCall(ident"Json", node)
-
-proc json(node: string): NimNode =
-  ## Convenience for Json("[]") in macros.
-  result = json newLit(node)
-
 func jason*(node: NimNode): NimNode =
   ## Convenience for jason(...) in macros.
   result = newCall(ident"jason", node)
@@ -82,6 +74,14 @@ macro jason*(js: Json): Json =
 
   result = js
 
+proc jasonify*(node: NimNode): NimNode =
+  ## Convenience for Json(...) in macros.
+  result = newCall(ident"Json", node)
+
+proc jasonify*(node: string): NimNode =
+  ## Convenience for Json(...) in macros.
+  result = jasonify newLit(node)
+
 macro jason*(s: string): Json =
   ## Escapes a string to form "JSON".
   runnableExamples:
@@ -89,7 +89,7 @@ macro jason*(s: string): Json =
     assert $j == "\"goats\""
 
   let escapist = bindSym "escapeJson"
-  result = json newCall(escapist, s)
+  result = jasonify newCall(escapist, s)
 
 macro jason*(b: bool): Json =
   ## Produce a JSON boolean, either `true` or `false`.
@@ -98,8 +98,8 @@ macro jason*(b: bool): Json =
     assert $j == "false"
 
   result = nnkIfExpr.newNimNode(b)
-  result.add newTree(nnkElifExpr, b, json"true")
-  result.add newTree(nnkElseExpr, json"false")
+  result.add newTree(nnkElifExpr, b, jasonify"true")
+  result.add newTree(nnkElseExpr, jasonify"false")
 
 func jason*(e: enum): Json =
   ## Render any `enum` type as a JSON integer, by default.
@@ -113,21 +113,28 @@ func jason*(f: SomeFloat): Json =
   ## Render any Nim float as a JSON number.
   result = Json($f)
 
-when not defined(nimdoc):
-  macro jason*(j: static[string]): Json = json newLit(j.jason.string)
-  macro jason*(j: static[bool]): Json = json newLit(j.jason.string)
-  macro jason*(j: static[int]): Json = json newLit(j.jason.string)
-  macro jason*(j: static[int8]): Json = json newLit(j.jason.string)
-  macro jason*(j: static[int16]): Json = json newLit(j.jason.string)
-  macro jason*(j: static[int32]): Json = json newLit(j.jason.string)
-  macro jason*(j: static[int64]): Json = json newLit(j.jason.string)
-  macro jason*(j: static[uint]): Json = json newLit(j.jason.string)
-  macro jason*(j: static[uint8]): Json = json newLit(j.jason.string)
-  macro jason*(j: static[uint16]): Json = json newLit(j.jason.string)
-  macro jason*(j: static[uint32]): Json = json newLit(j.jason.string)
-  macro jason*(j: static[uint64]): Json = json newLit(j.jason.string)
-  macro jason*(j: static[float]): Json = json newLit(j.jason.string)
-  macro jason*(j: static[float32]): Json = json newLit(j.jason.string)
+template staticJason*(typ: typedesc) =
+  ## Create a static JSON encoder for type `typ`.
+  when not defined(nimdoc):
+    macro jason(j: static[typ]): Json {.used.} =
+      ## Static JSON encoder for `typ`.
+      jasonify jason(j).string
+
+staticJason string
+staticJason bool
+staticJason float
+staticJason float32
+staticJason int
+staticJason int8
+staticJason int16
+staticJason int32
+staticJason int64
+staticJason uint
+staticJason uint8
+staticJason uint16
+staticJason uint32
+staticJason uint64
+export jason
 
 proc composeWithComma(parent: NimNode; js: NimNode): NimNode =
   # whether we need to add a comma before the next element
@@ -137,7 +144,7 @@ proc composeWithComma(parent: NimNode; js: NimNode): NimNode =
 
   var cond = nnkElifExpr.newNimNode
   cond.add comma                                     # if comma:
-  cond.add adder.newCall(js, json",")                # js.add ","
+  cond.add adder.newCall(js, jasonify",")            # js.add ","
 
   var toggle = nnkElseExpr.newNimNode                # else:
   toggle.add newAssignment(comma, ident"true")       # comma = true
@@ -158,7 +165,7 @@ macro jason*(a: JasonArray): Json =
   result = newStmtList()
 
   var js = gensym(nskVar, "js")
-  result.add newVarStmt(js, json"[")          # the leading [
+  result.add newVarStmt(js, jasonify"[")      # the leading [
 
   # make a loop over the items in the iterable
   let loop = block:
@@ -176,7 +183,7 @@ macro jason*(a: JasonArray): Json =
     loop
 
   result.add loop                             # add the loop
-  result.add adder.newCall(js, json"]")       # add the trailing ]
+  result.add adder.newCall(js, jasonify"]")   # add the trailing ]
 
   # the last statement in the statement list is the json
   result.add js
@@ -186,7 +193,7 @@ proc jasonCurly(o: NimNode): NimNode =
   result = newStmtList()
 
   var js = gensym(nskVar, "js")
-  result.add newVarStmt(js, json"{")
+  result.add newVarStmt(js, jasonify"{")
 
   # make a loop over the items in the iterable
   let loop = block:
@@ -196,7 +203,7 @@ proc jasonCurly(o: NimNode): NimNode =
     var body = nnkStmtList.newNimNode              # make body of a loop
     body.add composeWithComma(result, js)          # maybe add a separator
     body.add adder.newCall(js, key.jason)          # "somekey" (json)
-    body.add adder.newCall(js, json":")            # : (json)
+    body.add adder.newCall(js, jasonify":")        # : (json)
     body.add adder.newCall(js, val.jason)          # someval (json)
 
     var loop = nnkForStmt.newNimNode               # make for loop
@@ -208,7 +215,7 @@ proc jasonCurly(o: NimNode): NimNode =
     loop
 
   result.add loop                                  # add the loop
-  result.add adder.newCall(js, json"}")            # add the trailing ]
+  result.add adder.newCall(js, jasonify"}")        # add the trailing ]
 
   # the last statement in the statement list is the json
   result.add js
@@ -239,7 +246,7 @@ macro jason*(o: JasonObject): Json =
     # arr will hold a list of strings we'll concatenate at the end
     var arr = newStmtList()
     # this is the left-bracket of the json array syntax, `[ ... ]`
-    arr.add json"["
+    arr.add jasonify"["
     # a nim array will serve as input to the join()
     var inf = newNimNode(nnkBracket)
     for index, sym in pairs(typ):
@@ -252,9 +259,9 @@ macro jason*(o: JasonObject): Json =
       # the jason() in jason(:tmp[3])
       inf.add exp.jason
     # now join the array with commas
-    arr.add newCall(joiner, inf, json",")
+    arr.add newCall(joiner, inf, jasonify",")
     # and add the trailing "]"
-    arr.add json"]"
+    arr.add jasonify"]"
 
     # now fold the array with &
     result.add nestList(ander, arr)

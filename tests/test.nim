@@ -103,9 +103,14 @@ testes:
       if n.x mod 2 == 0: jason"even"
       else:              jason"odd"
 
-    macro jason(n: static[B]): Json =
-      newCall(ident"Json", newLit(n.jason.string))
+    # enabling compile-time encoding is easy
+    staticJason C
 
-    check a.jason == """"even""""
+    # or you can define static encoding yourself
+    macro jason(n: static[B]): Json =
+      if n.x mod 2 == 0: jasonify"1"
+      else:              jasonify"0"
+
+    check a.jason == "1"
     check b.jason == """"odd""""
     check c.jason == """["odd","even","odd"]"""
