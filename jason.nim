@@ -97,16 +97,9 @@ macro jason*(b: bool): Json =
     let j = jason(1 == 2)
     assert $j == "false"
 
-  var cond = nnkElifExpr.newNimNode
-  cond.add b
-  cond.add json"true"
-
-  var els = nnkElseExpr.newNimNode
-  els.add json"false"
-
-  result = nnkIfExpr.newNimNode
-  result.add cond
-  result.add els
+  result = nnkIfExpr.newNimNode(b)
+  result.add newTree(nnkElifExpr, b, json"true")
+  result.add newTree(nnkElseExpr, json"false")
 
 func jason*(e: enum): Json =
   ## Render any `enum` type as a JSON integer, by default.
