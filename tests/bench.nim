@@ -1,32 +1,8 @@
-import std/macros
+import std/jsonutils
 import std/json
 
 import jason
 import criterion
-
-var
-  tJsA {.compileTime.} = newJArray()
-  tJsO {.compileTime.} = newJObject()
-  tJs {.compileTime.} = newJObject()
-
-tJsA.add newJString"pigs"
-tJsA.add newJString"horses"
-
-tJsO.add "toads", newJBool(true)
-tJsO.add "rats", newJString"yep"
-
-for k, v in {
-  "goats": tJsA,
-  "sheep": newJInt(11),
-  "ducks": newJFloat(12.0),
-  "dogs": newJString("woof"),
-  "cats": newJBool(false),
-  "frogs": tJsO,
-}.items:
-  tJs[k] = v
-
-const
-  jsSize = len($tJs)
 
 type
   Some = object
@@ -35,97 +11,79 @@ type
     ducks: float
     dogs: string
     cats: bool
-    #frogs: tuple[toads: bool, rats: string]
+    fish: seq[uint64]
+    llama: (int, bool, string, float)
+    frogs: tuple[toads: bool, rats: string]
+    geese: (int, int, int, int, int)
 
 const
   thing = Some(goats: ["pigs", "horses"],
                sheep: 11, ducks: 12.0,
-               dogs: "woof", cats: false )#,
-               #frogs: (toads: true, rats: "yep"))
-
-var
-  thang = Some(goats: ["pigs", "horses"],
-               sheep: 11, ducks: 12.0,
-               dogs: "woof", cats: false) #,
-               #frogs: (toads: true, rats: "yep"))
+               fish: @[8'u64, 6, 7, 5, 3, 0, 9],
+               dogs: "woof", cats: false,
+               llama: (1, true, "secret", 42.0),
+               geese: (9, 0, 2, 1, 0),
+               frogs: (toads: true, rats: "yep"))
 
 var cfg = newDefaultConfig()
-cfg.budget = 0.5
 
 benchmark cfg:
-  let
-    jint = newJInt(45)
-    nint = 45
-    jstr = newJString("goats")
-    nstr = "pigs"
-  var
-    ntup1 = ("goats", "pigs")
-    jtup1 = newJArray()
-  jtup1.add newJString("goats")
-  jtup1.add newJString("pigs")
-  var
-    ntup2 = ("goats", 3)
-    jtup2 = newJArray()
-  jtup2.add newJString("goats")
-  jtup2.add newJInt(3)
-  type
-    Obj = object
-      goats: string
-      dogs: int
+  proc encode_stdlib_integer() {.measure.} =
+    discard $(toJson thing.sheep)
 
-  var
-    nobj = Obj(goats: "pigs", dogs: 3)
-    ntup3 = (goats: "pigs", dogs: 3)
-    jtup3 = newJObject()
-  jtup3.add "goats", newJString("pigs")
-  jtup3.add "dogs", newJInt(3)
-  var
-    narr = ["goats", "pigs"]
-    jarr = newJArray()
-  jarr.add newJString("goats")
-  jarr.add newJString("pigs")
+  proc encode_jason_integer() {.measure.} =
+    discard thing.sheep.jason.string
 
-  proc encode_stdlib_int() {.measure.} =
-    discard $jint
+  proc encode_stdlib_bool() {.measure.} =
+    discard $(toJson thing.cats)
 
-  proc encode_jason_int() {.measure.} =
-    discard nint.jason
+  proc encode_jason_bool() {.measure.} =
+    discard thing.cats.jason.string
 
-  proc encode_stdlib_str() {.measure.} =
-    discard $jstr
+  proc encode_stdlib_number() {.measure.} =
+    discard $(toJson thing.ducks)
 
-  proc encode_jason_str() {.measure.} =
-    discard nstr.jason
+  proc encode_jason_number() {.measure.} =
+    discard thing.ducks.jason.string
 
-  proc encode_stdlib_tup1() {.measure.} =
-    discard $jtup1
+  proc encode_stdlib_string() {.measure.} =
+    discard $(toJson thing.dogs)
 
-  proc encode_jason_tup1() {.measure.} =
-    discard ntup1.jason
+  proc encode_jason_string() {.measure.} =
+    discard thing.dogs.jason.string
 
-  proc encode_stdlib_tup2() {.measure.} =
-    discard $jtup2
+  proc encode_stdlib_tuple() {.measure.} =
+    discard $(toJson thing.geese)
 
-  proc encode_jason_tup2() {.measure.} =
-    discard ntup2.jason
+  proc encode_jason_tuple() {.measure.} =
+    discard thing.geese.jason.string
 
-  proc encode_stdlib_tup3() {.measure.} =
-    discard $jtup3
+  proc encode_stdlib_mixed_tuple() {.measure.} =
+    discard $(toJson thing.llama)
 
-  proc encode_jason_tup3() {.measure.} =
-    discard ntup3.jason
+  proc encode_jason_mixed_tuple() {.measure.} =
+    discard thing.llama.jason.string
 
-  proc encode_stdlib_arr() {.measure.} =
-    discard $jarr
+  proc encode_stdlib_named_tuple() {.measure.} =
+    discard $(toJson thing.frogs)
 
-  proc encode_jason_arr() {.measure.} =
-    discard narr.jason
+  proc encode_jason_named_tuple() {.measure.} =
+    discard thing.frogs.jason.string
 
-  proc encode_jason_obj() {.measure.} =
-    discard nobj.jason
+  proc encode_stdlib_array() {.measure.} =
+    discard $(toJson thing.goats)
 
-  proc encode_stdlib() {.measure.} =
-    discard $(%*thing)
+  proc encode_jason_array() {.measure.} =
+    discard thing.goats.jason.string
 
-  proc encode_jason() {.measure.} =
-    discard thing.jason
+  proc encode_stdlib_sequence() {.measure.} =
+    discard $(toJson thing.fish)
+
+  proc encode_jason_sequence() {.measure.} =
+    discard thing.fish.jason.string
+
+  proc encode_stdlib_large_object() {.measure.} =
+    discard $(toJson thing)
+
+  proc encode_jason_large_object() {.measure.} =
+    discard thing.jason.string
