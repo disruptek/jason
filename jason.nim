@@ -91,6 +91,14 @@ macro jason*(s: string): Json =
   let escapist = bindSym "escapeJson"
   result = json newCall(escapist, s)
 
+macro jason*(s: static[string]): Json =
+  ## Escapes a static string to form "JSON".
+  runnableExamples:
+    const g = "goats"
+    assert jason(g) == """"goats""""
+
+  result = json newLit(escapeJson s)
+
 macro jason*(b: bool): Json =
   ## Produce a JSON boolean, either `true` or `false`.
   runnableExamples:
