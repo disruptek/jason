@@ -19,18 +19,23 @@ Making some assumptions (ie. that our types aren't changing) allows...
 - predictably _idiomatic_ API
 - **hard to misuse**
 
-It's _fairly_ hard to misuse, but it's not fully optimized yet. In some cases,
-it's much faster than the standard json module. In a few, it's a little slower.
+It's _fairly_ hard to misuse, but it's not fully optimized yet. In most cases,
+it's faster than the standard library's `json` module. In rare cases, you may
+find it a little slower.
 
-The main advantage is that you get JSON encoding of tuples, objects, and
+Static values known at compile-time such as constants or macro outputs are
+serialized at compile-time. This is orders of magnitude faster than the
+standard library.
+
+But the main advantage is that you get JSON encoding of tuples, objects, and
 iterators "for free" -- no serialization to implement and no duplication of
 data.
 
 Everything is type-checked, too, so there will be no runtime serialization
 exceptions.
 
-And, if you _want_ to implement custom serialization, it's now trivial to do
-so for individual types.
+And, if you _want_ to implement custom serialization, it's now trivial to do so
+for individual types. You can also implement custom compile-time serialization.
 
 ## Usage
 
@@ -89,10 +94,18 @@ type
 let b = B(x: 3, y: "sup")
 let c: C = @[ B(x: 1), B(x: 2), B(x: 3) ]
 
+const a = B(x: 4, y: "compile-time!")
+
 func jason(n: B): Json =
+  ## my special json encoding for B
   if n.x mod 2 == 0: jason"even"
   else:              jason"odd"
 
+macro jason(n: static[B]): Json =
+  ## compile-time json encoding is free!
+  newCall(ident"Json", newLit(n.jason.string))
+
+echo a.jason      # "even"
 echo b.jason      # "odd"
 echo c.jason      # ["odd","even","odd"]
 ```

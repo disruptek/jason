@@ -27,7 +27,7 @@ proc join(a: openArray[Json]; sep = Json""): Json =
 # these are copied from stdlib so that we can be certain we match output
 # without having to import json and all of its dependencies...  i know.
 
-proc escapeJsonUnquoted(s: string; result: var string) =
+proc escapeJsonUnquoted(s: string; result: var string) {.used.} =
   ## Converts a string `s` to its JSON representation without quotes.
   ## Appends to ``result``.
   for c in s:
@@ -91,14 +91,6 @@ macro jason*(s: string): Json =
   let escapist = bindSym "escapeJson"
   result = json newCall(escapist, s)
 
-macro jason*(s: static[string]): Json =
-  ## Escapes a static string to form "JSON".
-  runnableExamples:
-    const g = "goats"
-    assert jason(g) == """"goats""""
-
-  result = json newLit(escapeJson s)
-
 macro jason*(b: bool): Json =
   ## Produce a JSON boolean, either `true` or `false`.
   runnableExamples:
@@ -120,6 +112,22 @@ func jason*(i: SomeInteger): Json =
 func jason*(f: SomeFloat): Json =
   ## Render any Nim float as a JSON number.
   result = Json($f)
+
+when not defined(nimdoc):
+  macro jason*(j: static[string]): Json = json newLit(j.jason.string)
+  macro jason*(j: static[bool]): Json = json newLit(j.jason.string)
+  macro jason*(j: static[int]): Json = json newLit(j.jason.string)
+  macro jason*(j: static[int8]): Json = json newLit(j.jason.string)
+  macro jason*(j: static[int16]): Json = json newLit(j.jason.string)
+  macro jason*(j: static[int32]): Json = json newLit(j.jason.string)
+  macro jason*(j: static[int64]): Json = json newLit(j.jason.string)
+  macro jason*(j: static[uint]): Json = json newLit(j.jason.string)
+  macro jason*(j: static[uint8]): Json = json newLit(j.jason.string)
+  macro jason*(j: static[uint16]): Json = json newLit(j.jason.string)
+  macro jason*(j: static[uint32]): Json = json newLit(j.jason.string)
+  macro jason*(j: static[uint64]): Json = json newLit(j.jason.string)
+  macro jason*(j: static[float]): Json = json newLit(j.jason.string)
+  macro jason*(j: static[float32]): Json = json newLit(j.jason.string)
 
 proc composeWithComma(parent: NimNode; js: NimNode): NimNode =
   # whether we need to add a comma before the next element
