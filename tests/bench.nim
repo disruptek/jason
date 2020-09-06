@@ -34,6 +34,8 @@ const
 var cfg = newDefaultConfig()
 cfg.brief = true
 
+echo "running benchmark..."
+
 benchmark cfg:
   proc encode_stdlib_integer() {.measure.} =
     discard $(toJson thing.sheep)

@@ -120,6 +120,8 @@ y.add "bif"                     # type error
 ```
 
 ## Benchmarks
+[The source to the benchmark is found in the tests directory.](https://github.com/disruptek/jason/blob/master/tests/bench.nim)
+
 ![benchmarks](docs/bench.svg "benchmarks")
 
 ## Installation
