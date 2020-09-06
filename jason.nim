@@ -24,6 +24,43 @@ proc join(a: openArray[Json]; sep = Json""): Json =
       result.add sep
     result.add item
 
+# these are copied from stdlib so that we can be certain we match output
+# without having to import json and all of its dependencies...  i know.
+
+proc escapeJsonUnquoted(s: string; result: var string) =
+  ## Converts a string `s` to its JSON representation without quotes.
+  ## Appends to ``result``.
+  for c in s:
+    case c
+    of '\L': result.add("\\n")
+    of '\b': result.add("\\b")
+    of '\f': result.add("\\f")
+    of '\t': result.add("\\t")
+    of '\v': result.add("\\u000b")
+    of '\r': result.add("\\r")
+    of '"': result.add("\\\"")
+    of '\0'..'\7': result.add("\\u000" & $ord(c))
+    of '\14'..'\31': result.add("\\u00" & toHex(ord(c), 2))
+    of '\\': result.add("\\\\")
+    else: result.add(c)
+
+proc escapeJsonUnquoted(s: string): string =
+  ## Converts a string `s` to its JSON representation without quotes.
+  result = newStringOfCap(s.len + s.len shr 3)
+  escapeJsonUnquoted(s, result)
+
+proc escapeJson(s: string; result: var string) =
+  ## Converts a string `s` to its JSON representation with quotes.
+  ## Appends to ``result``.
+  result.add("\"")
+  escapeJsonUnquoted(s, result)
+  result.add("\"")
+
+proc escapeJson(s: string): string =
+  ## Converts a string `s` to its JSON representation with quotes.
+  result = newStringOfCap(s.len + s.len shr 3)
+  escapeJson(s, result)
+
 proc json(node: NimNode): NimNode =
   ## Convenience for Json(...) in macros.
   result = newCall(ident"Json", node)
@@ -51,7 +88,7 @@ macro jason*(s: string): Json =
     let j = jason"goats"
     assert $j == "\"goats\""
 
-  let escapist = bindSym "escape"
+  let escapist = bindSym "escapeJson"
   result = json newCall(escapist, s)
 
 macro jason*(b: bool): Json =
