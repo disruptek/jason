@@ -22,7 +22,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        branch: [version-1-0, version-1-2, devel]
+        branch: [devel]
         target: [linux, macos, windows]
         include:
           - target: linux
