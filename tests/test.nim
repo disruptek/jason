@@ -60,13 +60,13 @@ testes:
     check jason((ref string) nil) == "null"
 
   test "tuple":
-    proc dumb1(): (int, string) = (1, "2")
-    proc dumb2(): tuple[a: int, b: string] = (1, "2")
-    proc dumb3(): tuple[a: int, b: string] = (a: 1, b: "2")
+    let dumb1: (int, string) = (1, "2")
+    let dumb2: tuple[a: int, b: string] = (1, "2")
+    let dumb3: tuple[a: int, b: string] = (a: 1, b: "2")
 
-    check dumb1().jason == Json"""[1,"2"]"""
-    check dumb2().jason == Json"""{"a":1,"b":"2"}"""
-    check dumb3().jason == Json"""{"a":1,"b":"2"}"""
+    check dumb1.jason == Json"""[1,"2"]"""
+    check dumb2.jason == Json"""{"a":1,"b":"2"}"""
+    check dumb3.jason == Json"""{"a":1,"b":"2"}"""
 
   test "object":
     type
