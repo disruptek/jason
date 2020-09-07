@@ -15,6 +15,41 @@ type
   Jasonable* = concept j   ## It should be serializable to JSON.
     jason(j) is Json
 
+  Rewrite = proc(n: NimNode): NimNode
+
+func `$`*(j: Json): string =
+  ## Convenience for Json.
+  result = j.string
+
+proc rewrite(n: NimNode; r: Rewrite): NimNode =
+  ## Rewrites a node; twice, if necessary.
+  result = r(n)
+  if result.isNil:
+    result = copyNimNode n
+    for kid in items(n):
+      result.add rewrite(kid, r)
+    let second = r(result)
+    if not second.isNil:
+      result = second
+
+proc combineLiterals(n: NimNode): NimNode =
+  ## Stolen from my testes and more important here.
+  proc combiner(n: NimNode): NimNode =
+    case n.kind
+    of nnkCall:
+      case $n[0]
+      of "$":
+        if n[1].kind == nnkStrLit:
+          result = n[1]
+      of "&":
+        if len(n) == 3 and {n[1].kind, n[2].kind} == {nnkStrLit}:
+          result = newLit(n[1].strVal & n[2].strVal)
+      else:
+        discard
+    else:
+      discard
+  result = rewrite(n, combiner)
+
 proc add(js: var Json; s: Json) {.borrow.}
 proc `&`(js: Json; s: Json): Json {.borrow.}
 
@@ -76,7 +111,8 @@ macro jason*(js: Json): Json =
 
 proc jasonify*(node: NimNode): NimNode =
   ## Convenience for Json(...) in macros.
-  result = newCall(ident"Json", node)
+  result = combineLiterals(node)
+  result = newCall(ident"Json", result)
 
 proc jasonify*(node: string): NimNode =
   ## Convenience for Json(...) in macros.
@@ -113,28 +149,65 @@ func jason*(f: SomeFloat): Json =
   ## Render any Nim float as a JSON number.
   result = Json($f)
 
-template staticJason*(typ: typedesc) =
-  ## Create a static JSON encoder for type `typ`.
-  when not defined(nimdoc):
-    macro jason(j: static[typ]): Json {.used.} =
-      ## Static JSON encoder for `typ`.
-      jasonify jason(j).string
+macro jason*[I, T](a: array[I, T]): Json =
+  ## Render any Nim array as a series of JSON values.
+  # make sure the array ast has the form we expect
+  let typ = a.getTypeImpl
+  expectKind(typ, nnkBracketExpr)
+  if len(typ) < 3 or typ[0].strVal != "array":
+    error "unexpected array form:\n" & treeRepr(typ)
+  else:
+    # take a look at the range definition for the array
+    let ranger = typ[1]
+    expectKind(ranger, nnkInfix)         # infix
+    expectKind(ranger[0], nnkIdent)      # ident".."
+    expectKind(ranger[1], nnkIntLit)     # 0
+    expectKind(ranger[2], nnkIntLit)     # 10
+    if $ranger[0] != "..":
+      error "unexpected infix range:\n" & treeRepr(ranger)
 
-staticJason string
-staticJason bool
-staticJason float
-staticJason float32
-staticJason int
-staticJason int8
-staticJason int16
-staticJason int32
-staticJason int64
-staticJason uint
-staticJason uint8
-staticJason uint16
-staticJason uint32
-staticJason uint64
-export jason
+    # okay, let's do this thing
+    let js = bindSym"jason"
+    let amper = bindSym"&"    # we need our Json concatenator
+    var list = newStmtList()
+    list.add jasonify"["
+    for index in ranger[1].intVal .. ranger[2].intVal:
+      if index != 0:
+        list.add jasonify","  # comma between each element
+      # build and invoke the array access expression `a[i]`
+      let access = newTree(nnkBracketExpr, a, index.newLit)
+      list.add newCall(js, access).jasonify
+    list.add jasonify"]"
+    result = nestList(amper, list)    # concatenate it all
+    result = jasonify result          # merge literals, etc.
+
+when false:
+  macro jason[T](j: T{lit|`const`}): Json =
+    ## Create a static JSON encoder for T.
+    var j = j
+    result = jason(j)
+else:
+  template staticJason*(typ: typedesc) =
+    ## Create a static JSON encoder for type `typ`.
+    when not defined(nimdoc):
+      macro jason(j: static[typ]): Json {.used.} =
+        ## Static JSON encoder for `typ`.
+        jasonify jason(j).string
+
+  staticJason string
+  staticJason bool
+  staticJason float
+  staticJason float32
+  staticJason int
+  staticJason int8
+  staticJason int16
+  staticJason int32
+  staticJason int64
+  staticJason uint
+  staticJason uint8
+  staticJason uint16
+  staticJason uint32
+  staticJason uint64
 
 proc composeWithComma(parent: NimNode; js: NimNode): NimNode =
   # whether we need to add a comma before the next element
@@ -231,7 +304,7 @@ macro jason*(o: JasonObject): Json =
 
   let
     joiner = bindSym "join"
-    ander = bindSym "&"
+    amper = bindSym "&"
     typ = o.getTypeInst
   if typ.kind != nnkTupleConstr:
     # use our object construction code for named tuples, objects
@@ -264,7 +337,7 @@ macro jason*(o: JasonObject): Json =
     arr.add jasonify"]"
 
     # now fold the array with &
-    result.add nestList(ander, arr)
+    result.add nestList(amper, arr)
 
 # i want this to be jason(o: ref Jasonable)
 func jason*(o: ref): Json =
@@ -274,6 +347,4 @@ func jason*(o: ref): Json =
   else:
     result = jason o[]
 
-func `$`*(j: Json): string =
-  ## Convenience for Json.
-  result = j.string
+export jason

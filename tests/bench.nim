@@ -12,7 +12,7 @@ when not defined(gcArc) and not defined(gcOrc):
 
 type
   Some = object
-    goats: array[2, string]
+    goats: array[4, string]
     sheep: int
     ducks: float
     dogs: string
@@ -23,7 +23,7 @@ type
     geese: (int, int, int, int, int)
 
 const
-  thing = Some(goats: ["pigs", "horses"],
+  thing = Some(goats: ["black", "pigs", "pink", "horses"],
                sheep: 11, ducks: 12.0,
                fish: @[8'u64, 6, 7, 5, 3, 0, 9],
                dogs: "woof", cats: false,
@@ -33,6 +33,7 @@ const
 
 var cfg = newDefaultConfig()
 cfg.brief = true
+cfg.budget = 0.5
 
 echo "running benchmark..."
 
