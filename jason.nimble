@@ -3,7 +3,7 @@ author = "disruptek"
 description = "compile-time json"
 license = "MIT"
 
-requires "nim >= 1.0.0 & < 2.0.0"
+requires "nim >= 1.3.5 & < 2.0.0"
 requires "https://github.com/disruptek/testes >= 0.3.2 & < 1.0.0"
 requires "https://github.com/disruptek/criterion < 1.0.0"
 
