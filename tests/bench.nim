@@ -33,7 +33,7 @@ const
 
 var cfg = newDefaultConfig()
 cfg.brief = true
-cfg.budget = 0.5
+cfg.budget = 1.0
 
 echo "running benchmark..."
 

@@ -167,19 +167,24 @@ macro jason*[I, T](a: array[I, T]): Json =
       error "unexpected infix range:\n" & treeRepr(ranger)
 
     # okay, let's do this thing
-    let js = bindSym"jason"
-    let amper = bindSym"&"    # we need our Json concatenator
+    let js = ident"jason"
+    let s = genSym(nskVar, "jason")
     var list = newStmtList()
-    list.add jasonify"["
+    # we'll make adding strings to our accumulating string easier...
+    template addString(x: typed): NimNode {.dirty.} =
+      # also cast the argument to a string just for correctness
+      list.add newCall(newDotExpr(s, bindSym"add"), newCall(ident"string", x))
+    # iterate over the array by index and add each item to the string
+    list.add newVarStmt(s, newLit"[")
     for index in ranger[1].intVal .. ranger[2].intVal:
       if index != 0:
-        list.add jasonify","  # comma between each element
+        addString newLit","   # comma between each element
       # build and invoke the array access expression `a[i]`
       let access = newTree(nnkBracketExpr, a, index.newLit)
-      list.add newCall(js, access).jasonify
-    list.add jasonify"]"
-    result = nestList(amper, list)    # concatenate it all
-    result = jasonify result          # merge literals, etc.
+      addString newCall(js, access)
+    addString newLit"]"
+    list.add s      # final value of the stmtlist is the string itself
+    result = newCall(bindSym"Json", list)
 
 when false:
   macro jason[T](j: T{lit|`const`}): Json =
