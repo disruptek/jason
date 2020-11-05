@@ -231,7 +231,7 @@ proc composeWithComma(parent: NimNode; js: NimNode): NimNode =
 macro jason*(a: JasonArray): Json =
   ## Render an iterable that isn't a named-tuple or object as a JSON array.
   runnableExamples:
-    let j = jason [1, 3, 5, 7]
+    let j = jason @[1, 3, 5, 7]
     assert $j == "[1,3,5,7]"
 
   let adder = bindSym "add"
