@@ -123,9 +123,14 @@ y.add "bif"                     # type error
 ```
 
 ## Benchmarks
-[The source to the benchmark is found in the tests directory.](https://github.com/disruptek/jason/blob/master/tests/bench.nim)
 
-![benchmarks](docs/bench.svg "benchmarks")
+### jason versus std/json
+[The source to the benchmark is found in the tests directory.](https://github.com/disruptek/jason/blob/master/tests/bench.nim)
+![bench](docs/bench.svg "bench")
+
+### jason versus packedjson
+[There is also a benchmark for the packedjson library.](https://github.com/disruptek/jason/blob/master/tests/packed.nim)
+![packedjson](docs/packed.svg "packedjson")
 
 ## Installation
 

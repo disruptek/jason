@@ -10,3 +10,7 @@
 	path = grok
 	url = git+ssh://git@github.com/disruptek/grok
 	branch = master
+[submodule "packedjson"]
+	path = packedjson
+	url = https://github.com/Araq/packedjson
+	branch = master
