@@ -1,11 +1,11 @@
 [submodule "testes"]
 	path = testes
 	url = https://github.com/disruptek/testes
-	branch = tag/0.3.2
+	branch = master
 [submodule "criterion"]
 	path = criterion
 	url = https://github.com/disruptek/criterion
-	branch = tag/0.2.0
+	branch = master
 [submodule "grok"]
 	path = grok
 	url = https://github.com/disruptek/grok
