@@ -29,6 +29,6 @@ proc execTest(test: string) =
 task test, "run tests for ci":
   execTest("tests/test.nim")
 
-task docs, "generate benchmark":
-  exec "termtosvg docs/bench.svg --max-frame-duration=3000 --loop-delay=3000 --screen-geometry=80x30 --template=window_frame_powershell --command=\"nim c --gc:arc --define:danger -r tests/bench.nim\""
-  exec "termtosvg docs/packed.svg --max-frame-duration=3000 --loop-delay=3000 --screen-geometry=80x30 --template=window_frame_powershell --command=\"nim c --gc:arc --define:danger -r tests/packed.nim\""
+task demo, "generate benchmarks":
+  exec """demo docs/bench.svg "nim c --out=\$1 --gc:arc --define:danger tests/bench.nim""""
+  exec """demo docs/packed.svg "nim c --out=\$1 --gc:arc --define:danger tests/packed.nim""""
