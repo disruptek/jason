@@ -1,5 +1,6 @@
-import testes
+import std/macros
 
+import testes
 import jason
 
 type
@@ -52,6 +53,11 @@ testes:
     check [1, 2, 3].jason == "[1,2,3]"
     check @[1, 2, 3].jason == "[1,2,3]"
 
+  test "slow array":
+    let (x, y) = ("3", 4)
+    check [x, x, x].jason == Json"""["3","3","3"]"""
+    check [y, y, y].jason == Json"""[4,4,4]"""
+
   test "ref":
     var
       x: ref int = new(int)
@@ -67,6 +73,11 @@ testes:
     check dumb1.jason == Json"""[1,"2"]"""
     check dumb2.jason == Json"""{"a":1,"b":"2"}"""
     check dumb3.jason == Json"""{"a":1,"b":"2"}"""
+
+  test "slow tuple":
+    let (x, y) = ("3", 4)
+    check (x, y).jason == Json"""["3",4]"""
+    check (a: x, b: y).jason == Json"""{"a":"3","b":4}"""
 
   test "object":
     type
