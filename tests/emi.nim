@@ -126,7 +126,7 @@ benchmark cfg:
     s.setPosition 0
     s.write thing.goats.jason.string
 
-echo "\nNOTE: uint serialization is unsupported by eminimjson\n"
+echo "\nNOTE: uint serialization is unsupported by eminim\n"
 
 benchmark cfg:
   proc encode_eminim_sequence() {.measure.} =
