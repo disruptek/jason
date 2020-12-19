@@ -125,17 +125,34 @@ y.add "bif"                     # type error
 ## Benchmarks
 
 ### jason versus std/json
-[The source to the benchmark is found in the tests directory.](https://github.com/disruptek/jason/blob/master/tests/bench.nim)
+
+[The source to the benchmark is found in the tests
+directory.](https://github.com/disruptek/jason/blob/master/tests/bench.nim)
+
 ![bench](docs/bench.svg "bench")
 
 ### jason versus packedjson
-[There is also a benchmark for the packedjson library.](https://github.com/disruptek/jason/blob/master/tests/packed.nim)
+
+[There is also a benchmark for the packedjson
+library.](https://github.com/disruptek/jason/blob/master/tests/packed.nim)
+**Note:** The primary reason to choose `packedjson` is low memory overhead
+during *deserialization*.
+
 ![packedjson](docs/packed.svg "packedjson")
+
+### jason versus eminim
+
+[This is a comparison with the eminim
+library.](https://github.com/disruptek/jason/blob/master/tests/emi.nim) As
+`eminim` serializes only to streams, we similarly issue a stream write in the
+`jason` benchmarks here, so that fair comparison may be made.
+
+![eminim](docs/eminim.svg "eminim")
 
 ## Installation
 
 ```
-$ nimph clone disruptek/jason
+$ nimph clone jason
 ```
 or if you're still using Nimble like it's 2012,
 ```

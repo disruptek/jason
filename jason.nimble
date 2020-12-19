@@ -32,3 +32,4 @@ task test, "run tests for ci":
 task demo, "generate benchmarks":
   exec """demo docs/bench.svg "nim c --out=\$1 --gc:arc --define:danger tests/bench.nim""""
   exec """demo docs/packed.svg "nim c --out=\$1 --gc:arc --define:danger tests/packed.nim""""
+  exec """demo docs/eminim.svg "nim c --out=\$1 --gc:arc --define:danger tests/emi.nim""""

@@ -14,3 +14,7 @@
 	path = packedjson
 	url = https://github.com/Araq/packedjson
 	branch = master
+[submodule "eminim"]
+	path = eminim
+	url = https://github.com/planetis-m/eminim
+	branch = master
