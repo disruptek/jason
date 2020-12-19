@@ -10,32 +10,22 @@
 
 "I don't care." -- _Araq, 2020_
 
-## Goals
+## Why?
 
-Making some assumptions (ie. that our types aren't changing) allows...
+- [This is the fastest known JSON serializer for Nim.](https://github.com/disruptek/jason#benchmarks)
+- It's pretty hard to misuse, but as simple as it is, it will get even better when the new concepts implementation lands in Nim.
+- It's not *fully* optimized yet; there's quite a bit more room to improve.
+- I *may* add a deserializer if a strong candidate doesn't materialize.  🤔
 
-- predictably fast performance
-- predictably mild memory behavior
-- predictably _idiomatic_ API
-- **hard to misuse**
+Advantages of `jason` over other serializers:
 
-It's _fairly_ hard to misuse, but it's not fully optimized yet. In most cases,
-it's faster than the standard library's `json` module. In rare cases, you may
-find it a little slower.
+1. encoding of tuples, objects, and iterators is "free" -- no loops to write
+and few-to-zero copies
 
-Static values known at compile-time such as constants or macro outputs are
-serialized at compile-time. [This is orders of magnitude faster than the
-standard library](https://github.com/disruptek/jason#benchmarks).
+1. no runtime serialization exceptions and a distinct JSON type for safety
 
-But the main advantage is that you get JSON encoding of tuples, objects, and
-iterators "for free" -- no serialization to implement and no duplication of
-data.
-
-Everything is type-checked, too, so there will be no runtime serialization
-exceptions.
-
-And, if you _want_ to implement custom serialization, it's now trivial to do so
-for individual types. You can also implement custom compile-time serialization.
+1. easy custom serialization for your types, and even custom compile-time
+serialization
 
 ## Usage
 

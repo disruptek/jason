@@ -18,3 +18,7 @@
 	path = eminim
 	url = https://github.com/planetis-m/eminim
 	branch = master
+[submodule "jsony"]
+	path = jsony
+	url = https://github.com/treeform/jsony
+	branch = master
