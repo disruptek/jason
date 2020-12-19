@@ -149,11 +149,11 @@ macro jason*(b: bool): Json =
   result.add newTree(nnkElseExpr, jasonify"false")
 
 func jason*(e: enum): Json =
-  ## Render any `enum` type as a JSON integer, by default.
+  ## Render any `enum` type as a JSON number, by default.
   result = Json $ord(e)
 
 func jason*(i: SomeInteger): Json =
-  ## Render any Nim integer as a JSON integer.
+  ## Render any Nim integer as a JSON number.
   result = Json $i
 
 func jason*(f: SomeFloat): Json =
