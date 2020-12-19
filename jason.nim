@@ -351,7 +351,6 @@ macro jason*(o: JasonObject): Json =
     let k = jason (one: 1, two: "too", three: 3.0)
     assert $k == """{"one":1,"two":"too","three":3.0}"""
 
-  let js = bindSym"jason"
   case o.getTypeInst.kind
   of nnkTupleConstr:
     result = jasonTuple o

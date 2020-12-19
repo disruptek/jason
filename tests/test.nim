@@ -1,5 +1,3 @@
-import std/macros
-
 import testes
 import jason
 
@@ -97,7 +95,10 @@ testes:
       s = Some(a: "hello", b: Two, c: 34, g: x, h: y, i: z,
                d: @[1, 1, 2, 3, 5], e: true, j: (4, 5),
                f: ["a", "c", "d", "b"], z: (ref Some) nil)
-    check s.jason == """{"a":"hello","b":1,"c":34,"d":[1,1,2,3,5],"e":true,"f":["a","c","d","b"],"g":45,"h":"world","i":null,"j":{"goats":4,"pigs":5},"z":null}"""
+    check s.jason == """{"a":"hello","b":1,"c":34,"d":[1,1,2,3,5],""" &
+                     """"e":true,"f":["a","c","d","b"],"g":45,""" &
+                     """"h":"world","i":null,"j":{"goats":4,"pigs":5},""" &
+                     """"z":null}"""
 
   test "custom":
     type
