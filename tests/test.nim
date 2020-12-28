@@ -126,3 +126,12 @@ testes:
     check a.jason == "1"
     check b.jason == """"odd""""
     check c.jason == """["odd","even","odd"]"""
+
+  test "tuple of tuples":
+    let x = ((1, 2),(3, 4),(5, 6),(7, 8))
+    check $jason(x) == "[[1,2],[3,4],[5,6],[7,8]]"
+
+  test "tuple of tuples of tuples":
+    # from sealmove:
+    let x = (((1, 2),(3, 4)), ((5, 6),(7, 8)))
+    check $jason(x) == "[[[1,2],[3,4]][[5,6],[7,8]]]"
