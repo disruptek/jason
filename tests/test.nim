@@ -1,3 +1,5 @@
+import std/options
+
 import testes
 import jason
 
@@ -126,6 +128,11 @@ testes:
     check a.jason == "1"
     check b.jason == """"odd""""
     check c.jason == """["odd","even","odd"]"""
+
+  test "option":
+    check:
+      $jason(some "foo") == """{"val":"foo","has":true}"""
+      $jason(none int) == """{"val":0,"has":false}"""
 
   test "tuple of tuples":
     let x = ((1, 2),(3, 4),(5, 6),(7, 8))
