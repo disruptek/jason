@@ -1,3 +1,5 @@
+import std/options
+
 import testes
 import jason
 
@@ -48,34 +50,39 @@ testes:
     check Two.jason == "1"
 
   test "array":
-    check [1, 2, 3].jason == "[1,2,3]"
-    check @[1, 2, 3].jason == "[1,2,3]"
+    check:
+      [1, 2, 3].jason == "[1,2,3]"
+      @[1, 2, 3].jason == "[1,2,3]"
 
   test "slow array":
     let (x, y) = ("3", 4)
-    check [x, x, x].jason == Json"""["3","3","3"]"""
-    check [y, y, y].jason == Json"""[4,4,4]"""
+    check:
+      [x, x, x].jason == Json"""["3","3","3"]"""
+      [y, y, y].jason == Json"""[4,4,4]"""
 
   test "ref":
     var
       x: ref int = new(int)
     x[] = 45
-    check "45" == x.jason
-    check jason((ref string) nil) == "null"
+    check:
+      "45" == x.jason
+      jason((ref string) nil) == "null"
 
   test "tuple":
-    let dumb1: (int, string) = (1, "2")
-    let dumb2: tuple[a: int, b: string] = (1, "2")
-    let dumb3: tuple[a: int, b: string] = (a: 1, b: "2")
-
-    check dumb1.jason == Json"""[1,"2"]"""
-    check dumb2.jason == Json"""{"a":1,"b":"2"}"""
-    check dumb3.jason == Json"""{"a":1,"b":"2"}"""
+    let
+      dumb1: (int, string) = (1, "2")
+      dumb2: tuple[a: int, b: string] = (1, "2")
+      dumb3: tuple[a: int, b: string] = (a: 1, b: "2")
+    check:
+      dumb1.jason == Json"""[1,"2"]"""
+      dumb2.jason == Json"""{"a":1,"b":"2"}"""
+      dumb3.jason == Json"""{"a":1,"b":"2"}"""
 
   test "slow tuple":
     let (x, y) = ("3", 4)
-    check (x, y).jason == Json"""["3",4]"""
-    check (a: x, b: y).jason == Json"""{"a":"3","b":4}"""
+    check:
+      (x, y).jason == Json"""["3",4]"""
+      (a: x, b: y).jason == Json"""{"a":"3","b":4}"""
 
   test "object":
     type
@@ -123,6 +130,22 @@ testes:
       if n.x mod 2 == 0: jasonify"1"
       else:              jasonify"0"
 
-    check a.jason == "1"
-    check b.jason == """"odd""""
-    check c.jason == """["odd","even","odd"]"""
+    check:
+      a.jason == "1"
+      b.jason == """"odd""""
+      c.jason == """["odd","even","odd"]"""
+
+  test "option":
+    check:
+      $jason(some "foo") == """{"val":"foo","has":true}"""
+      $jason(none int) == """{"val":0,"has":false}"""
+
+  test "tuple attack":
+    let x = ((1, 2),(3, 4),(5, 6),(7, 8))
+    check $jason(x) == "[[1,2],[3,4],[5,6],[7,8]]"
+    let y = (((1, 2),(3, 4)), ((5, 6),(7, 8))) # (from sealmove)
+    check $jason(y) == "[[[1,2],[3,4]],[[5,6],[7,8]]]"
+
+  test "object example":
+    let j = jason Exception(name: "jeff", msg: "bummer")
+    check $j == """{"parent":null,"name":"jeff","msg":"bummer","trace":[],"up":null}"""

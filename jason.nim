@@ -4,10 +4,6 @@ import std/strutils
 type
   Json* = distinct string   ## Serialized JSON.
 
-  JasonObject = concept j
-    for v in fields(j):
-      v is Jasonable
-
   JasonArray = concept j
     for v in j:
       v is Jasonable
@@ -129,14 +125,18 @@ proc jasonify*(node: NimNode): NimNode =
   else:
     result = newCall(ident"Json", result)
 
-macro jason*(s: string): Json =
+macro jason*(s: string or cstring): Json =
   ## Escapes a string to form "JSON".
   runnableExamples:
     let j = jason"goats"
     assert $j == "\"goats\""
 
   let escapist = bindSym"escapeJson"
-  result = jasonify newCall(escapist, s)
+  result = s
+  # convert cstring into string, first
+  if s.getType.strVal == "cstring":
+    result = newCall(bindSym"$", result)
+  result = jasonify newCall(escapist, result)
 
 macro jason*(b: bool): Json =
   ## Produce a JSON boolean, either `true` or `false`.
@@ -160,10 +160,43 @@ func jason*(f: SomeFloat): Json =
   ## Render any Nim float as a JSON number.
   result = Json $f
 
+proc jasonSquare*(a: NimNode): NimNode =
+  ## Render an iterable that isn't a named-tuple or object as a JSON array.
+  let adder = bindSym"add"
+  result = newStmtList()
+
+  var js = gensym(nskVar, "js")
+  result.add newVarStmt(js, jasonify"[")      # the leading [
+
+  # add a loop over the items in the iterable
+  result.add:
+    var index = gensym(nskForVar, "index")    # make loop var
+    var value = gensym(nskForVar, "value")    # make loop var
+
+    var body = nnkStmtList.newNimNode         # make body of a loop
+    body.add:
+      newIfStmt (infix(index, "!=", newLit 0),    # if index != 0
+                 adder.newCall(js, jasonify","))  # js.add Json","
+
+    body.add adder.newCall(js, value.jason)   # add the json for value
+
+    var loop = nnkForStmt.newNimNode          # for loop
+    loop.add index                            # add loop var
+    loop.add value                            # add loop var
+    loop.add a                                # add any iterable
+    loop.add body                             # add loop body
+    loop
+
+  result.add adder.newCall(js, jasonify"]")   # add the trailing ]
+  result.add js    # the last statement in the stmtlist is the json
+
 macro jason*[I, T](a: array[I, T]): Json =
   ## Render any Nim array as a series of JSON values.
   # make sure the array ast has the form we expect
   let typ = a.getTypeImpl
+  # support for nim-1.2
+  if typ.kind == nnkBracket:
+    return jasonSquare a
   expectKind(typ, nnkBracketExpr)
   if len(typ) < 3 or typ[0].strVal != "array":
     error "unexpected array form:\n" & treeRepr(typ)
@@ -209,6 +242,7 @@ else:
         ## Static JSON encoder for `typ`.
         jasonify jason(j).string
 
+  staticJason cstring
   staticJason string
   staticJason bool
   staticJason float
@@ -243,36 +277,6 @@ proc composeWithComma(parent: NimNode; js: NimNode): NimNode =
 
   sep
 
-proc jasonSquare*(a: NimNode): NimNode =
-  ## Render an iterable that isn't a named-tuple or object as a JSON array.
-  let adder = bindSym"add"
-  result = newStmtList()
-
-  var js = gensym(nskVar, "js")
-  result.add newVarStmt(js, jasonify"[")      # the leading [
-
-  # add a loop over the items in the iterable
-  result.add:
-    var index = gensym(nskForVar, "index")    # make loop var
-    var value = gensym(nskForVar, "value")    # make loop var
-
-    var body = nnkStmtList.newNimNode         # make body of a loop
-    body.add:
-      newIfStmt (infix(index, "!=", newLit 0),    # if index != 0
-                 adder.newCall(js, jasonify","))  # js.add Json","
-
-    body.add adder.newCall(js, value.jason)   # add the json for value
-
-    var loop = nnkForStmt.newNimNode          # for loop
-    loop.add index                            # add loop var
-    loop.add value                            # add loop var
-    loop.add a                                # add any iterable
-    loop.add body                             # add loop body
-    loop
-
-  result.add adder.newCall(js, jasonify"]")   # add the trailing ]
-  result.add js    # the last statement in the stmtlist is the json
-
 proc jasonTuple(t: NimNode): NimNode =
   ## Render an anonymous tuple as a JSON array.
   let adder = bindSym"add"
@@ -295,6 +299,8 @@ macro jason*(a: JasonArray): Json =
   runnableExamples:
     let j = jason @[1, 3, 5, 7]
     assert $j == "[1,3,5,7]"
+    let k = jason (1, 3, 5, 7)
+    assert $k == "[1,3,5,7]"
 
   case a.kind
   of nnkTupleConstr:
@@ -334,7 +340,6 @@ proc jasonCurly(o: NimNode): NimNode =
   # the last statement in the statement list is the json
   result.add js
 
-# i want this to be jason(o: ref Jasonable)
 func jason*(o: ref): Json =
   ## Render a Nim `ref` as either `null` or the value to which it refers.
   if o.isNil:
@@ -342,9 +347,9 @@ func jason*(o: ref): Json =
   else:
     result = jason o[]
 
-macro jason*(o: JasonObject): Json =
-  ## Render an anonymous Nim tuple as a JSON array; objects and named
-  ## tuples become JSON objects.
+macro jason*(o: tuple): Json =
+  ## Render an anonymous Nim tuple as a JSON array;
+  ## named tuples become JSON objects.
   runnableExamples:
     let j = jason (1, "too", 3.0)
     assert $j == """[1,"too",3.0]"""
@@ -355,7 +360,14 @@ macro jason*(o: JasonObject): Json =
   of nnkTupleConstr:
     result = jasonTuple o
   else:
-    # use our object construction code for named tuples, objects
+    # use our object construction code for named tuples
     result = jasonCurly o
+
+macro jason*(o: object): Json =
+  ## Render an object as JSON.
+  runnableExamples:
+    let j = jason Exception(name: "jeff", msg: "bummer")
+    assert $j == """{"parent":null,"name":"jeff","msg":"bummer","trace":[],"up":null}"""
+  result = jasonCurly o
 
 export jason
