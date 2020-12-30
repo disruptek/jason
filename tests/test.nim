@@ -141,4 +141,4 @@ testes:
   test "tuple of tuples of tuples":
     # from sealmove:
     let x = (((1, 2),(3, 4)), ((5, 6),(7, 8)))
-    check $jason(x) == "[[[1,2],[3,4]][[5,6],[7,8]]]"
+    check $jason(x) == "[[[1,2],[3,4]],[[5,6],[7,8]]]"

@@ -4,10 +4,6 @@ import std/strutils
 type
   Json* = distinct string   ## Serialized JSON.
 
-  JasonObject = concept j
-    for v in fields(j):
-      v is Jasonable
-
   JasonArray = concept j
     for v in j:
       v is Jasonable
@@ -300,6 +296,8 @@ macro jason*(a: JasonArray): Json =
   runnableExamples:
     let j = jason @[1, 3, 5, 7]
     assert $j == "[1,3,5,7]"
+    let k = jason (1, 3, 5, 7)
+    assert $k == "[1,3,5,7]"
 
   case a.kind
   of nnkTupleConstr:
@@ -347,9 +345,9 @@ func jason*(o: ref): Json =
   else:
     result = jason o[]
 
-macro jason*(o: JasonObject): Json =
-  ## Render an anonymous Nim tuple as a JSON array; objects and named
-  ## tuples become JSON objects.
+macro jason*(o: tuple): Json =
+  ## Render an anonymous Nim tuple as a JSON array;
+  ## named tuples become JSON objects.
   runnableExamples:
     let j = jason (1, "too", 3.0)
     assert $j == """[1,"too",3.0]"""
@@ -360,7 +358,14 @@ macro jason*(o: JasonObject): Json =
   of nnkTupleConstr:
     result = jasonTuple o
   else:
-    # use our object construction code for named tuples, objects
+    # use our object construction code for named tuples
     result = jasonCurly o
+
+macro jason*(o: object): Json =
+  ## Render an object as JSON.
+  runnableExamples:
+    let j = jason Exception(msg: "bummer")
+    assert $j == """{"parent":null,"name":"Exception","msg":"bummer","trace":[],"up":null}"""
+  result = jasonCurly o
 
 export jason
