@@ -145,3 +145,7 @@ testes:
     check $jason(x) == "[[1,2],[3,4],[5,6],[7,8]]"
     let y = (((1, 2),(3, 4)), ((5, 6),(7, 8))) # (from sealmove)
     check $jason(y) == "[[[1,2],[3,4]],[[5,6],[7,8]]]"
+
+  test "object example":
+    let j = jason Exception(name: "jeff", msg: "bummer")
+    check $j == """{"parent":null,"name":"jeff","msg":"bummer","trace":[],"up":null}"""

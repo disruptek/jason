@@ -366,7 +366,7 @@ macro jason*(o: tuple): Json =
 macro jason*(o: object): Json =
   ## Render an object as JSON.
   runnableExamples:
-    let j = jason Exception(msg: "bummer")
+    let j = jason Exception(name: "jeff", msg: "bummer")
     assert $j == """{"parent":null,"name":"Exception","msg":"bummer","trace":[],"up":null}"""
   result = jasonCurly o
 
