@@ -129,14 +129,18 @@ proc jasonify*(node: NimNode): NimNode =
   else:
     result = newCall(ident"Json", result)
 
-macro jason*(s: string): Json =
+macro jason*(s: string or cstring): Json =
   ## Escapes a string to form "JSON".
   runnableExamples:
     let j = jason"goats"
     assert $j == "\"goats\""
 
   let escapist = bindSym"escapeJson"
-  result = jasonify newCall(escapist, s)
+  result = s
+  # convert cstring into string, first
+  if s.getType.strVal == "cstring":
+    result = newCall(bindSym"$", result)
+  result = jasonify newCall(escapist, result)
 
 macro jason*(b: bool): Json =
   ## Produce a JSON boolean, either `true` or `false`.
@@ -209,6 +213,7 @@ else:
         ## Static JSON encoder for `typ`.
         jasonify jason(j).string
 
+  staticJason cstring
   staticJason string
   staticJason bool
   staticJason float
