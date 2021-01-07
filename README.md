@@ -114,6 +114,13 @@ y.add "bif"                     # type error
 
 ## Benchmarks
 
+### jason versus jsony
+
+[This is a comparison with the jsony
+library.](https://github.com/disruptek/jason/blob/master/tests/sonny.nim)
+
+![jsony](docs/jsony.svg "jsony")
+
 ### jason versus std/json
 
 [The source to the benchmark is found in the tests
