@@ -160,7 +160,7 @@ func jason*(f: SomeFloat): Jason =
   ## Render any Nim float as a JSON number.
   result = Jason $f
 
-proc jasonSquare*(a: NimNode): NimNode =
+proc jasonSquare(a: NimNode): NimNode =
   ## Render an iterable that isn't a named-tuple or object as a JSON array.
   let adder = bindSym"add"
   result = newStmtList()
