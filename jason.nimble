@@ -1,4 +1,4 @@
-version = "0.4.1"
+version = "1.0.0"
 author = "disruptek"
 description = "compile-time json"
 license = "MIT"

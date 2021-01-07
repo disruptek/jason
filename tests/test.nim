@@ -23,13 +23,13 @@ type
 
 # convenience
 
-func `==`(js: Json; s: Json): bool =
+func `==`(js: Jason; s: Jason): bool =
   result = system.`==`(js.string, s.string)
 
-func `==`(js: Json; s: string): bool =
+func `==`(js: Jason; s: string): bool =
   result = system.`==`(js.string, s)
 
-func `==`(s: string; js: Json): bool =
+func `==`(s: string; js: Jason): bool =
   result = system.`==`(js.string, s)
 
 
@@ -57,8 +57,8 @@ testes:
   test "slow array":
     let (x, y) = ("3", 4)
     check:
-      [x, x, x].jason == Json"""["3","3","3"]"""
-      [y, y, y].jason == Json"""[4,4,4]"""
+      [x, x, x].jason == Jason"""["3","3","3"]"""
+      [y, y, y].jason == Jason"""[4,4,4]"""
 
   test "ref":
     var
@@ -74,15 +74,15 @@ testes:
       dumb2: tuple[a: int, b: string] = (1, "2")
       dumb3: tuple[a: int, b: string] = (a: 1, b: "2")
     check:
-      dumb1.jason == Json"""[1,"2"]"""
-      dumb2.jason == Json"""{"a":1,"b":"2"}"""
-      dumb3.jason == Json"""{"a":1,"b":"2"}"""
+      dumb1.jason == Jason"""[1,"2"]"""
+      dumb2.jason == Jason"""{"a":1,"b":"2"}"""
+      dumb3.jason == Jason"""{"a":1,"b":"2"}"""
 
   test "slow tuple":
     let (x, y) = ("3", 4)
     check:
-      (x, y).jason == Json"""["3",4]"""
-      (a: x, b: y).jason == Json"""{"a":"3","b":4}"""
+      (x, y).jason == Jason"""["3",4]"""
+      (a: x, b: y).jason == Jason"""{"a":"3","b":4}"""
 
   test "object":
     type
@@ -118,7 +118,7 @@ testes:
     let b = B(x: 3, y: "sup")
     let c: C = @[ B(x: 1), B(x: 2), B(x: 3) ]
 
-    func jason(n: B): Json =
+    func jason(n: B): Jason =
       if n.x mod 2 == 0: jason"even"
       else:              jason"odd"
 
@@ -126,7 +126,7 @@ testes:
     staticJason C
 
     # or you can define static encoding yourself
-    macro jason(n: static[B]): Json =
+    macro jason(n: static[B]): Jason =
       if n.x mod 2 == 0: jasonify"1"
       else:              jasonify"0"
 

@@ -86,7 +86,7 @@ let c: C = @[ B(x: 1), B(x: 2), B(x: 3) ]
 
 const a = B(x: 4, y: "compile-time!")
 
-func jason(n: B): Json =
+func jason(n: B): Jason =
   if n.x mod 2 == 0: jason"even"
   else:              jason"odd"
 
@@ -94,7 +94,7 @@ func jason(n: B): Json =
 staticJason C
 
 # or you can define static encoding yourself
-macro jason(n: static[B]): Json =
+macro jason(n: static[B]): Jason =
   if n.x mod 2 == 0: jasonify"1"
   else:              jasonify"0"
 
@@ -103,7 +103,7 @@ check b.jason == """"odd""""
 check c.jason == """["odd","even","odd"]"""
 ```
 
-`Json` is a proper type.
+`Jason` is a proper type.
 
 ```nim
 var n: string = jason"foo"      # type error

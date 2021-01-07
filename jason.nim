@@ -2,19 +2,19 @@ import std/macros
 import std/strutils
 
 type
-  Json* = distinct string   ## Serialized JSON.
+  Jason* = distinct string   ## Serialized JSON.
 
   JasonArray = concept j
     for v in j:
       v is Jasonable
 
   Jasonable* = concept j   ## It should be serializable to JSON.
-    jason(j) is Json
+    jason(j) is Jason
 
   Rewrite = proc(n: NimNode): NimNode
 
-func `$`*(j: Json): string =
-  ## Convenience for Json.
+func `$`*(j: Jason): string =
+  ## Convenience for Jason.
   result = j.string
 
 proc rewrite(n: NimNode; r: Rewrite): NimNode =
@@ -46,10 +46,10 @@ proc combineLiterals(n: NimNode): NimNode =
       discard
   result = rewrite(n, combiner)
 
-proc add(js: var Json; s: Json) {.borrow.}
-proc `&`(js: Json; s: Json): Json {.borrow.}
+proc add(js: var Jason; s: Jason) {.borrow.}
+proc `&`(js: Jason; s: Jason): Jason {.borrow.}
 
-proc join(a: openArray[Json]; sep = Json""): Json =
+proc join(a: openArray[Jason]; sep = Jason""): Jason =
   for index, item in a:
     if index != 0:
       result.add sep
@@ -103,8 +103,8 @@ func jason*(node: NimNode): NimNode =
   ## Convenience for jason(...) in macros.
   result = newCall(ident"jason", node)
 
-macro jason*(js: Json): Json =
-  ## Idempotent Json handler.
+macro jason*(js: Jason): Jason =
+  ## Idempotent Jason handler.
   runnableExamples:
     let j = 3.jason
     let k = jason j
@@ -113,19 +113,19 @@ macro jason*(js: Json): Json =
   result = js
 
 proc jasonify*(node: string): NimNode =
-  ## Convenience for Json(...) in macros.
-  result = nnkCallStrLit.newTree(ident"Json", newLit node)
+  ## Convenience for Jason(...) in macros.
+  result = nnkCallStrLit.newTree(ident"Jason", newLit node)
 
 proc jasonify*(node: NimNode): NimNode =
-  ## Convenience for Json(...) in macros.
+  ## Convenience for Jason(...) in macros.
   result = combineLiterals(node)
   case result.kind
   of nnkStrLit:
     result = jasonify result.strVal
   else:
-    result = newCall(ident"Json", result)
+    result = newCall(ident"Jason", result)
 
-macro jason*(s: string or cstring): Json =
+macro jason*(s: string or cstring): Jason =
   ## Escapes a string to form "JSON".
   runnableExamples:
     let j = jason"goats"
@@ -138,7 +138,7 @@ macro jason*(s: string or cstring): Json =
     result = newCall(bindSym"$", result)
   result = jasonify newCall(escapist, result)
 
-macro jason*(b: bool): Json =
+macro jason*(b: bool): Jason =
   ## Produce a JSON boolean, either `true` or `false`.
   runnableExamples:
     let j = jason(1 == 2)
@@ -148,17 +148,17 @@ macro jason*(b: bool): Json =
   result.add newTree(nnkElifExpr, b, jasonify"true")
   result.add newTree(nnkElseExpr, jasonify"false")
 
-func jason*(e: enum): Json =
+func jason*(e: enum): Jason =
   ## Render any `enum` type as a JSON number, by default.
-  result = Json $ord(e)
+  result = Jason $ord(e)
 
-func jason*(i: SomeInteger): Json =
+func jason*(i: SomeInteger): Jason =
   ## Render any Nim integer as a JSON number.
-  result = Json $i
+  result = Jason $i
 
-func jason*(f: SomeFloat): Json =
+func jason*(f: SomeFloat): Jason =
   ## Render any Nim float as a JSON number.
-  result = Json $f
+  result = Jason $f
 
 proc jasonSquare*(a: NimNode): NimNode =
   ## Render an iterable that isn't a named-tuple or object as a JSON array.
@@ -176,7 +176,7 @@ proc jasonSquare*(a: NimNode): NimNode =
     var body = nnkStmtList.newNimNode         # make body of a loop
     body.add:
       newIfStmt (infix(index, "!=", newLit 0),    # if index != 0
-                 adder.newCall(js, jasonify","))  # js.add Json","
+                 adder.newCall(js, jasonify","))  # js.add Jason","
 
     body.add adder.newCall(js, value.jason)   # add the json for value
 
@@ -190,7 +190,7 @@ proc jasonSquare*(a: NimNode): NimNode =
   result.add adder.newCall(js, jasonify"]")   # add the trailing ]
   result.add js    # the last statement in the stmtlist is the json
 
-macro jason*[I, T](a: array[I, T]): Json =
+macro jason*[I, T](a: array[I, T]): Jason =
   ## Render any Nim array as a series of JSON values.
   # make sure the array ast has the form we expect
   let typ = a.getTypeImpl
@@ -227,10 +227,10 @@ macro jason*[I, T](a: array[I, T]): Json =
       addString js.newCall(nnkBracketExpr.newTree(a, newLit index))
     addString newLit"]"
     list.add s      # final value of the stmtlist is the string itself
-    result = newCall(ident"Json", list)
+    result = newCall(ident"Jason", list)
 
 when false:
-  macro jason[T](j: T{lit|`const`}): Json =
+  macro jason[T](j: T{lit|`const`}): Jason =
     ## Create a static JSON encoder for T.
     var j = j
     result = jason(j)
@@ -238,7 +238,7 @@ else:
   template staticJason*(typ: typedesc) =
     ## Create a static JSON encoder for type `typ`.
     when not defined(nimdoc):
-      macro jason(j: static[typ]): Json {.used.} =
+      macro jason(j: static[typ]): Jason {.used.} =
         ## Static JSON encoder for `typ`.
         jasonify jason(j).string
 
@@ -294,7 +294,7 @@ proc jasonTuple(t: NimNode): NimNode =
   result.add adder.newCall(js, jasonify"]")   # add the trailing ]
   result.add js    # the last statement in the stmtlist is the json
 
-macro jason*(a: JasonArray): Json =
+macro jason*(a: JasonArray): Jason =
   ## Render an iterable that isn't a named-tuple or object as a JSON array.
   runnableExamples:
     let j = jason @[1, 3, 5, 7]
@@ -340,14 +340,14 @@ proc jasonCurly(o: NimNode): NimNode =
   # the last statement in the statement list is the json
   result.add js
 
-func jason*(o: ref): Json =
+func jason*(o: ref): Jason =
   ## Render a Nim `ref` as either `null` or the value to which it refers.
   if o.isNil:
-    result = Json"null"
+    result = Jason"null"
   else:
     result = jason o[]
 
-macro jason*(o: tuple): Json =
+macro jason*(o: tuple): Jason =
   ## Render an anonymous Nim tuple as a JSON array;
   ## named tuples become JSON objects.
   runnableExamples:
@@ -363,7 +363,7 @@ macro jason*(o: tuple): Json =
     # use our object construction code for named tuples
     result = jasonCurly o
 
-macro jason*(o: object): Json =
+macro jason*(o: object): Jason =
   ## Render an object as JSON.
   runnableExamples:
     let j = jason Exception(name: "jeff", msg: "bummer")
