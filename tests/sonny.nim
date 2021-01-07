@@ -37,80 +37,80 @@ echo "running benchmark..."
 
 benchmark cfg:
   proc encode_jsony_integer() {.measure.} =
-    discard thing.sheep.toJson.string
+    discard thing.sheep.toJson
 
 benchmark cfg:
   proc encode_jason_integer() {.measure.} =
-    discard thing.sheep.jason.string
+    discard thing.sheep.jason
 
 benchmark cfg:
   proc encode_jsony_bool() {.measure.} =
-    discard thing.cats.toJson.string
+    discard thing.cats.toJson
 
 benchmark cfg:
   proc encode_jason_bool() {.measure.} =
-    discard thing.cats.jason.string
+    discard thing.cats.jason
 
 benchmark cfg:
   proc encode_jsony_number() {.measure.} =
-    discard thing.ducks.toJson.string
+    discard thing.ducks.toJson
 
 benchmark cfg:
   proc encode_jason_number() {.measure.} =
-    discard thing.ducks.jason.string
+    discard thing.ducks.jason
 
 benchmark cfg:
   proc encode_jsony_string() {.measure.} =
-    discard thing.dogs.toJson.string
+    discard thing.dogs.toJson
 
 benchmark cfg:
-  proc encode_jason_string() {.measure.} =
-    discard thing.dogs.jason.string
+  proc encode_jason() {.measure.} =
+    discard thing.dogs.jason
 
 benchmark cfg:
   proc encode_jsony_tuple() {.measure.} =
-    discard thing.geese.toJson.string
+    discard thing.geese.toJson
 
 benchmark cfg:
   proc encode_jason_tuple() {.measure.} =
-    discard thing.geese.jason.string
+    discard thing.geese.jason
 
 benchmark cfg:
   proc encode_jsony_mixed_tuple() {.measure.} =
-    discard thing.llama.toJson.string
+    discard thing.llama.toJson
 
 benchmark cfg:
   proc encode_jason_mixed_tuple() {.measure.} =
-    discard thing.llama.jason.string
+    discard thing.llama.jason
 
 benchmark cfg:
   proc encode_jsony_named_tuple() {.measure.} =
-    discard thing.frogs.toJson.string
+    discard thing.frogs.toJson
 
 benchmark cfg:
   proc encode_jason_named_tuple() {.measure.} =
-    discard thing.frogs.jason.string
+    discard thing.frogs.jason
 
 benchmark cfg:
   proc encode_jsony_array() {.measure.} =
-    discard thing.goats.toJson.string
+    discard thing.goats.toJson
 
 benchmark cfg:
   proc encode_jason_array() {.measure.} =
-    discard thing.goats.jason.string
+    discard thing.goats.jason
 
 benchmark cfg:
   proc encode_jsony_sequence() {.measure.} =
-    discard thing.fish.toJson.string
+    discard thing.fish.toJson
 
 benchmark cfg:
   proc encode_jason_sequence() {.measure.} =
-    discard thing.fish.jason.string
+    discard thing.fish.jason
 
 benchmark cfg:
   proc encode_jsony_large_object() {.measure.} =
-    discard thing.toJson.string
+    discard thing.toJson
 
 benchmark cfg:
   proc encode_jason_large_object() {.measure.} =
-    discard thing.jason.string
+    discard thing.jason
