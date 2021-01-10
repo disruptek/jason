@@ -21,6 +21,16 @@ type
     j: tuple[goats: int; pigs: int]
     z: ref Some
 
+  CreepyVariant = object
+    foo: int
+    bar: float
+    case bif: Enum
+    of One:
+      baz: bool
+    of Two:
+      boz: tuple[a: int, b: float]
+    bin: array[4, string]
+
 # convenience
 
 func `==`(js: Jason; s: Jason): bool =
@@ -149,3 +159,13 @@ testes:
   test "object example":
     let j = jason Exception(name: "jeff", msg: "bummer")
     check $j == """{"parent":null,"name":"jeff","msg":"bummer","trace":[],"up":null}"""
+
+  test "creepy variant":
+    const
+      c = CreepyVariant(foo: 3, bar: 4.0, bif: One, baz: true,
+                        bin: ["e", "f", "g", "h"])
+      d = CreepyVariant(foo: 2, bar: 8.0, bif: Two, boz: (6, 7.0),
+                        bin: ["i", "j", "k", "l"])
+
+    check $jason(c) == """{"foo":3,"bar":4.0,"bif":0,"baz":true,"bin":["e","f","g","h"]}"""
+    check $jason(d) == """{"foo":2,"bar":8.0,"bif":1,"boz":{"a":6,"b":7.0},"bin":["i","j","k","l"]}"""
