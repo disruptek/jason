@@ -33,15 +33,8 @@ type
 
 # convenience
 
-func `==`(js: Jason; s: Jason): bool =
-  result = system.`==`(js.string, s.string)
-
-func `==`(js: Jason; s: string): bool =
-  result = system.`==`(js.string, s)
-
-func `==`(s: string; js: Jason): bool =
-  result = system.`==`(js.string, s)
-
+func `==`(js: Jason or string; s: Jason or string): bool =
+  system.`==`(js.string, s.string)
 
 testes:
   test "string":
@@ -60,13 +53,13 @@ testes:
     check Two.jason == "1"
 
   test "array":
-    check:
+    check "arrays and seqs":
       [1, 2, 3].jason == "[1,2,3]"
       @[1, 2, 3].jason == "[1,2,3]"
 
   test "slow array":
     let (x, y) = ("3", 4)
-    check:
+    check "arrays of strings and ints":
       [x, x, x].jason == Jason"""["3","3","3"]"""
       [y, y, y].jason == Jason"""[4,4,4]"""
 
@@ -74,7 +67,7 @@ testes:
     var
       x: ref int = new(int)
     x[] = 45
-    check:
+    check "refs and string":
       "45" == x.jason
       jason((ref string) nil) == "null"
 
@@ -83,14 +76,14 @@ testes:
       dumb1: (int, string) = (1, "2")
       dumb2: tuple[a: int, b: string] = (1, "2")
       dumb3: tuple[a: int, b: string] = (a: 1, b: "2")
-    check:
+    check "named and unnamed tuples":
       dumb1.jason == Jason"""[1,"2"]"""
       dumb2.jason == Jason"""{"a":1,"b":"2"}"""
       dumb3.jason == Jason"""{"a":1,"b":"2"}"""
 
   test "slow tuple":
     let (x, y) = ("3", 4)
-    check:
+    check "named and unnamed tuples":
       (x, y).jason == Jason"""["3",4]"""
       (a: x, b: y).jason == Jason"""{"a":"3","b":4}"""
 
@@ -140,13 +133,13 @@ testes:
       if n.x mod 2 == 0: jasonify"1"
       else:              jasonify"0"
 
-    check:
+    check "custom serializers":
       a.jason == "1"
       b.jason == """"odd""""
       c.jason == """["odd","even","odd"]"""
 
   test "option":
-    check:
+    check "serialized options":
       $jason(some "foo") == """{"val":"foo","has":true}"""
       $jason(none int) == """{"val":0,"has":false}"""
 
@@ -166,6 +159,8 @@ testes:
                         bin: ["e", "f", "g", "h"])
       d = CreepyVariant(foo: 2, bar: 8.0, bif: Two, boz: (6, 7.0),
                         bin: ["i", "j", "k", "l"])
-
-    check $jason(c) == """{"foo":3,"bar":4.0,"bif":0,"baz":true,"bin":["e","f","g","h"]}"""
-    check $jason(d) == """{"foo":2,"bar":8.0,"bif":1,"boz":{"a":6,"b":7.0},"bin":["i","j","k","l"]}"""
+    let
+      cj = $jason(c)
+      dj = $jason(d)
+    check cj == """{"foo":3,"bar":4.0,"bif":0,"baz":true,"bin":["e","f","g","h"]}"""
+    check dj == """{"foo":2,"bar":8.0,"bif":1,"boz":{"a":6,"b":7.0},"bin":["i","j","k","l"]}"""

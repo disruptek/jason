@@ -1,10 +1,10 @@
-version = "1.0.0"
+version = "1.0.1"
 author = "disruptek"
 description = "compile-time json"
 license = "MIT"
 
 when not defined(release):
-  requires "https://github.com/disruptek/testes >= 0.7.12 & < 1.0.0"
+  requires "https://github.com/disruptek/testes >= 1.0.0 & < 2.0.0"
   requires "https://github.com/disruptek/criterion < 1.0.0"
 
 task test, "run tests for ci":
