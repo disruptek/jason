@@ -171,11 +171,10 @@ testes:
       E = enum one, two, three, four
       B = array[E, string]
     let y: B = [one: "a", two: "b", three: "c", four: "d"]
-    checkpoint $jason(y)
     check $jason(y) == """["a","b","c","d"]"""
 
   test "arrays with subset of enum indices":
-    when true:
+    when false:
       skip"does not work yet due to broken ast"
     else:
       type

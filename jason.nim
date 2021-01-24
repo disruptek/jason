@@ -221,7 +221,9 @@ macro jason*[I, T](a: array[I, T]): Jason =
     # we'll make adding strings to our accumulating string easier...
     template addString(x: typed): NimNode {.dirty.} =
       # also cast the argument to a string just for correctness
-      list.add newCall(newDotExpr(s, bindSym"add"), newCall(ident"string", x))
+      add list:
+        s.newDotExpr(bindSym"add").newCall:
+          ident"string".newCall x
 
     template composeIt(iter: typed; body: untyped) {.dirty.} =
       var first = true
@@ -239,13 +241,13 @@ macro jason*[I, T](a: array[I, T]): Jason =
 
     # iterate over the array by index and add each item to the string
     case ranger.kind
-    of nnkInfix, nnkSym:
+    of nnkBracketExpr, nnkInfix, nnkSym:
       # type A = array[0..10, string]
       # type A = array[foo..bar, string]
       expectKind(ranger[1], nnkIntLit)     # 0
       expectKind(ranger[2], nnkIntLit)     # 10
-      if $ranger[0] notin ["..", "range"]:
-        error "unexpected infix range:\n" & treeRepr(ranger)
+      #if $ranger[0] notin ["..", "range"]:
+      #  error "unexpected infix range:\n" & treeRepr(ranger)
       composeIt ranger[1].intVal .. ranger[2].intVal:
         newLit it.int
     of nnkEnumTy:
