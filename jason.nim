@@ -203,15 +203,16 @@ macro jason*[I, T](a: array[I, T]): Jason =
   else:
     # take a look at the range definition for the array
     let ranger = typ[1]
-    if ranger.kind == nnkBracketExpr:
-      echo treeRepr(ranger)
-      echo "get type1: ", treeRepr(ranger.getType)
-      echo "get inst1: ", treeRepr(ranger.getTypeInst)
-      echo "get impl1: ", treeRepr(ranger.getTypeImpl)
-      var ranger = ranger.getTypeInst
-      echo "get type2: ", treeRepr(ranger.getType)
-      echo "get inst2: ", treeRepr(ranger.getTypeInst)
-      echo "get impl2: ", treeRepr(ranger.getTypeImpl)
+    when false:
+      if ranger.kind == nnkBracketExpr:
+        echo treeRepr(ranger)
+        echo "get type1: ", treeRepr(ranger.getType)
+        echo "get inst1: ", treeRepr(ranger.getTypeInst)
+        echo "get impl1: ", treeRepr(ranger.getTypeImpl)
+        var ranger = ranger.getTypeInst
+        echo "get type2: ", treeRepr(ranger.getType)
+        echo "get inst2: ", treeRepr(ranger.getTypeInst)
+        echo "get impl2: ", treeRepr(ranger.getTypeImpl)
 
     # okay, let's do this thing
     let js = ident"jason"
@@ -246,8 +247,6 @@ macro jason*[I, T](a: array[I, T]): Jason =
       # type A = array[foo..bar, string]
       expectKind(ranger[1], nnkIntLit)     # 0
       expectKind(ranger[2], nnkIntLit)     # 10
-      #if $ranger[0] notin ["..", "range"]:
-      #  error "unexpected infix range:\n" & treeRepr(ranger)
       composeIt ranger[1].intVal .. ranger[2].intVal:
         newLit it.int
     of nnkEnumTy:
