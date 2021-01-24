@@ -1,6 +1,6 @@
 import std/options
 
-import testes
+import balls
 import jason
 
 type
@@ -36,7 +36,7 @@ type
 func `==`(js: Jason or string; s: Jason or string): bool =
   system.`==`(js.string, s.string)
 
-testes:
+suite "sweet json":
   test "string":
     check jason"hello" == """"hello""""
 
@@ -164,3 +164,21 @@ testes:
       dj = $jason(d)
     check cj == """{"foo":3,"bar":4.0,"bif":0,"baz":true,"bin":["e","f","g","h"]}"""
     check dj == """{"foo":2,"bar":8.0,"bif":1,"boz":{"a":6,"b":7.0},"bin":["i","j","k","l"]}"""
+
+  test "arrays with enum indices":
+    type
+      E = enum one, two, three, four
+      B = array[E, string]
+    let y: B = [one: "a", two: "b", three: "c", four: "d"]
+    check $jason(y) == """["a","b","c","d"]"""
+
+  test "arrays with subset of enum indices":
+    when true:
+      skip"does not work yet; broken typed macro ast?"
+    else:
+      type
+        E = enum one, two, three, four
+        A = array[two..four, string]
+      let x: A = [two: "b", three: "c", four: "d"]
+      checkpoint $jason(x)
+      check $jason(x) == """["b","c","d"]"""

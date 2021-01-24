@@ -193,7 +193,7 @@ proc jasonSquare(a: NimNode): NimNode =
 macro jason*[I, T](a: array[I, T]): Jason =
   ## Render any Nim array as a series of JSON values.
   # make sure the array ast has the form we expect
-  let typ = a.getTypeImpl
+  let typ = a.getType
   # support for nim-1.2
   if typ.kind == nnkBracket:
     return jasonSquare a
@@ -203,28 +203,59 @@ macro jason*[I, T](a: array[I, T]): Jason =
   else:
     # take a look at the range definition for the array
     let ranger = typ[1]
-    expectKind(ranger, nnkInfix)         # infix
-    expectKind(ranger[0], nnkIdent)      # ident".."
-    expectKind(ranger[1], nnkIntLit)     # 0
-    expectKind(ranger[2], nnkIntLit)     # 10
-    if $ranger[0] != "..":
-      error "unexpected infix range:\n" & treeRepr(ranger)
+    when false:
+      if ranger.kind == nnkBracketExpr:
+        echo treeRepr(ranger)
+        echo "get type1: ", treeRepr(ranger.getType)
+        echo "get inst1: ", treeRepr(ranger.getTypeInst)
+        echo "get impl1: ", treeRepr(ranger.getTypeImpl)
+        var ranger = ranger.getTypeInst
+        echo "get type2: ", treeRepr(ranger.getType)
+        echo "get inst2: ", treeRepr(ranger.getTypeInst)
+        echo "get impl2: ", treeRepr(ranger.getTypeImpl)
 
     # okay, let's do this thing
     let js = ident"jason"
     let s = genSym(nskVar, "jason")
     var list = newStmtList()
+
     # we'll make adding strings to our accumulating string easier...
     template addString(x: typed): NimNode {.dirty.} =
       # also cast the argument to a string just for correctness
-      list.add newCall(newDotExpr(s, bindSym"add"), newCall(ident"string", x))
-    # iterate over the array by index and add each item to the string
+      add list:
+        s.newDotExpr(bindSym"add").newCall:
+          ident"string".newCall x
+
+    template composeIt(iter: typed; body: untyped) {.dirty.} =
+      var first = true
+      for it {.inject.} in iter:
+        #var it {.inject.} = it
+        if first:
+          first = false
+        else:
+          addString newLit","   # comma between each element
+        let index = body
+        # s.add jason(a[index])
+        addString js.newCall(nnkBracketExpr.newTree(a, index))
+
     list.add newVarStmt(s, newLit"[")
-    for index in ranger[1].intVal .. ranger[2].intVal:
-      if index != 0:
-        addString newLit","   # comma between each element
-      # s.add jason(a[index])
-      addString js.newCall(nnkBracketExpr.newTree(a, newLit index))
+
+    # iterate over the array by index and add each item to the string
+    case ranger.kind
+    of nnkBracketExpr, nnkInfix, nnkSym:
+      # type A = array[0..10, string]
+      # type A = array[foo..bar, string]
+      expectKind(ranger[1], nnkIntLit)     # 0
+      expectKind(ranger[2], nnkIntLit)     # 10
+      composeIt ranger[1].intVal .. ranger[2].intVal:
+        newLit it.int
+    of nnkEnumTy:
+      # type A = array[Enum, string]
+      composeIt 1 ..< ranger.len:
+        ranger[it]
+    else:
+      error "expected infix or enum:\n" & treeRepr(ranger)
+
     addString newLit"]"
     list.add s      # final value of the stmtlist is the string itself
     result = newCall(ident"Jason", list)
