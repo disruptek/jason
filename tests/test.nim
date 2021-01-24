@@ -1,7 +1,7 @@
 import std/macros
 import std/options
 
-import testes
+import balls
 import jason
 
 type
@@ -37,7 +37,7 @@ type
 func `==`(js: Jason or string; s: Jason or string): bool =
   system.`==`(js.string, s.string)
 
-testes:
+suite "sweet json":
   test "string":
     check jason"hello" == """"hello""""
 
