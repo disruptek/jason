@@ -13,7 +13,7 @@
 ## Why?
 
 - [This is the fastest known JSON serializer for Nim.](https://github.com/disruptek/jason#benchmarks)
-- It's pretty hard to misuse, but as simple as it is, it will get even better when the new concepts implementation lands in Nim.
+- It's pretty hard to misuse, but as simple as it is, it will get even better if a new concepts implementation lands in Nim.
 - It's not *fully* optimized yet; there's quite a bit more room to improve.
 - I *may* add a deserializer if a strong candidate doesn't materialize.  🤔
 
