@@ -1,0 +1,30 @@
+Jason	jason.html#Jason	jason: Jason	
+Jasonable	jason.html#Jasonable	jason: Jasonable	
+`$`	jason.html#$,Jason	jason: `$`(j: Jason): string	
+jason	jason.html#jason,NimNode	jason: jason(node: NimNode): NimNode	
+jason	jason.html#jason.m,Jason	jason: jason(js: Jason): Jason	
+jasonify	jason.html#jasonify,string	jason: jasonify(node: string): NimNode	
+jasonify	jason.html#jasonify,NimNode	jason: jasonify(node: NimNode): NimNode	
+jason	jason.html#jason.m	jason: jason(s: string or cstring): Jason	
+jason	jason.html#jason.m,bool	jason: jason(b: bool): Jason	
+jason	jason.html#jason_2	jason: jason(e: enum): Jason	
+jason	jason.html#jason,SomeInteger	jason: jason(i: SomeInteger): Jason	
+jason	jason.html#jason,SomeFloat	jason: jason(f: SomeFloat): Jason	
+jason	jason.html#jason.m,array[I,T]	jason: jason[I, T](a: array[I, T]): Jason	
+staticJason	jason.html#staticJason.t,typedesc	jason: staticJason(typ: typedesc)	
+jason	jason.html#jason.m,JasonArray	jason: jason(a: JasonArray): Jason	
+jason	jason.html#jason,ref	jason: jason(o: ref): Jason	
+jason	jason.html#jason.m_2	jason: jason(o: tuple): Jason	
+jason	jason.html#jason.m_3	jason: jason(o: object): Jason	
+jason	jason.html#jason,NimNode_2	jason: jason(node: NimNode): NimNode	
+jason	jason.html#jason.m,bool_2	jason: jason(b: bool): Jason	
+jason	jason.html#jason.m_4	jason: jason(s: string or cstring): Jason	
+jason	jason.html#jason.m,Jason_2	jason: jason(js: Jason): Jason	
+jason	jason.html#jason_3	jason: jason(e: enum): Jason	
+jason	jason.html#jason,SomeInteger_2	jason: jason(i: SomeInteger): Jason	
+jason	jason.html#jason,SomeFloat_2	jason: jason(f: SomeFloat): Jason	
+jason	jason.html#jason.m,array[I,T]_2	jason: jason[I, T](a: array[I, T]): Jason	
+jason	jason.html#jason.m,JasonArray_2	jason: jason(a: JasonArray): Jason	
+jason	jason.html#jason,ref_2	jason: jason(o: ref): Jason	
+jason	jason.html#jason.m_5	jason: jason(o: tuple): Jason	
+jason	jason.html#jason.m_6	jason: jason(o: object): Jason	
